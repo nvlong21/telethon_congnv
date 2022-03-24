@@ -28,12 +28,9 @@ async def forward_job():
     if STRING_SESSION:
         session = StringSession(STRING_SESSION)
     else:
-        session = 'forwarder'
+        session = '3a668517313b4e6587d124a574645674'
     client = TelegramClient(session, API_ID, API_HASH)
     await client.connect()
-    await client.send_code_request("+84986626975")
-    code = input()
-    await client.sign_in(code=code)
     # async with TelegramClient(session, API_ID, API_HASH) as client:
     #     list_client.append(client)
     #     confirm = ''' IMPORTANT 🛑

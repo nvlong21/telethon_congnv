@@ -2,26 +2,26 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-10">
-        <h1>Books</h1>
+        <h1>Sesss</h1>
         <hr><br><br>
         <alert :message=message v-if="showMessage"></alert>
-        <button type="button" class="btn btn-success btn-sm" v-b-modal.book-modal>Add Book</button>
+        <button type="button" class="btn btn-success btn-sm" v-b-modal.sess-modal>Add Sess</button>
         <br><br>
         <table class="table table-hover">
           <thead>
             <tr>
               <th scope="col">Title</th>
-              <th scope="col">Author</th>
+              <th scope="col">Phone</th>
               <th scope="col">Read?</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(book, index) in books" :key="index">
-              <td>{{ book.title }}</td>
-              <td>{{ book.phone }}</td>
+            <tr v-for="(sess, index) in sesss" :key="index">
+              <td>{{ sess.title }}</td>
+              <td>{{ sess.phone }}</td>
               <td>
-                <span v-if="book.status">Yes</span>
+                <span v-if="sess.status">Yes</span>
                 <span v-else>No</span>
               </td>
               <td>
@@ -29,14 +29,14 @@
                   <button
                           type="button"
                           class="btn btn-warning btn-sm"
-                          v-b-modal.book-update-modal
-                          @click="editBook(book)">
+                          v-b-modal.sess-update-modal
+                          @click="editSess(sess)">
                       Update
                   </button>
                   <button
                           type="button"
                           class="btn btn-danger btn-sm"
-                          @click="onDeleteBook(book)">
+                          @click="onDeleteSess(sess)">
                       Delete
                   </button>
                 </div>
@@ -46,9 +46,9 @@
         </table>
       </div>
     </div>
-    <b-modal ref="addBookModal"
-            id="book-modal"
-            title="Add a new book"
+    <b-modal ref="addSessModal"
+            id="sess-modal"
+            title="Add a new sess"
             hide-footer>
       <b-form @submit="onSubmit" @reset="onReset" class="w-100">
       <b-form-group id="form-title-group"
@@ -56,34 +56,54 @@
                     label-for="form-title-input">
           <b-form-input id="form-title-input"
                         type="text"
-                        v-model="addBookForm.title"
+                        v-model="addSessForm.title"
                         required
                         placeholder="Enter title">
           </b-form-input>
         </b-form-group>
         <b-form-group id="form-phone-group"
-                      label="Author:"
+                      label="Phone:"
                       label-for="form-phone-input">
             <b-form-input id="form-phone-input"
                           type="text"
-                          v-model="addBookForm.phone"
+                          v-model="addSessForm.phone"
                           required
                           placeholder="Enter phone">
             </b-form-input>
           </b-form-group>
-        <b-form-group id="form-status-group">
-          <b-form-checkbox-group v-model="addBookForm.status" id="form-checks">
-            <b-form-checkbox value="true">Read?</b-form-checkbox>
-          </b-form-checkbox-group>
-        </b-form-group>
         <b-button-group>
           <b-button type="submit" variant="primary">Submit</b-button>
           <b-button type="reset" variant="danger">Reset</b-button>
         </b-button-group>
       </b-form>
     </b-modal>
-    <b-modal ref="editBookModal"
-            id="book-update-modal"
+        <b-modal ref="addSessCodeModal"
+            id="sess-code-modal"
+            title="Add a new sess"
+            hide-footer>
+      <b-form @submit="onSubmitCode" @reset="onResetCode" class="w-100">
+      <b-form-group id="form-code-group"
+                    label="Code:"
+                    label-for="form-code-input">
+        </b-form-group>
+        <b-form-group id="form-code-group"
+                      label="Phone:"
+                      label-for="form-code-input">
+            <b-form-input id="form-code-input"
+                          type="text"
+                          v-model="addSessCodeForm.code"
+                          required
+                          placeholder="Enter code">
+            </b-form-input>
+          </b-form-group>
+        <b-button-group>
+          <b-button type="submit" variant="primary">Submit</b-button>
+          <b-button type="reset" variant="danger">Reset</b-button>
+        </b-button-group>
+      </b-form>
+    </b-modal>
+    <b-modal ref="editSessModal"
+            id="sess-update-modal"
             title="Update"
             hide-footer>
       <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
@@ -98,7 +118,7 @@
           </b-form-input>
         </b-form-group>
         <b-form-group id="form-phone-edit-group"
-                      label="Author:"
+                      label="Phone:"
                       label-for="form-phone-edit-input">
             <b-form-input id="form-phone-edit-input"
                           type="text"
@@ -128,11 +148,14 @@ import Alert from './Alert.vue';
 export default {
   data() {
     return {
-      books: [],
-      addBookForm: {
+      sesss: [],
+      addSessForm: {
         title: '',
         phone: '',
         status: [],
+      },
+      addSessCodeForm: {
+        code: '',
       },
       message: '',
       showMessage: false,
@@ -148,35 +171,36 @@ export default {
     alert: Alert,
   },
   methods: {
-    getBooks() {
-      const path = 'http://localhost:5000/books';
+    getSesss() {
+      const path = 'http://localhost:5000/sesss';
       axios.get(path)
         .then((res) => {
-          this.books = res.data.books;
+          this.sesss = res.data.sesss;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
         });
     },
-    addBook(payload) {
-      const path = 'http://localhost:5000/books';
+    addSess(payload) {
+      const path = 'http://localhost:5000/sesss';
       axios.post(path, payload)
         .then(() => {
-          this.getBooks();
-          this.message = 'Book added!';
+          this.getSesss();
+          this.message = 'Sess added!';
           this.showMessage = true;
+          this.$refs.addSessCodeModal.modal('show');
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.log(error);
-          this.getBooks();
+          this.getSesss();
         });
     },
     initForm() {
-      this.addBookForm.title = '';
-      this.addBookForm.phone = '';
-      this.addBookForm.status = [];
+      this.addSessForm.title = '';
+      this.addSessForm.phone = '';
+      this.addSessForm.status = [];
       this.editForm.id = '';
       this.editForm.title = '';
       this.editForm.phone = '';
@@ -184,28 +208,28 @@ export default {
     },
     onSubmit(evt) {
       evt.preventDefault();
-      this.$refs.addBookModal.hide();
+      this.$refs.addSessModal.hide();
       let status = false;
-      if (this.addBookForm.status[0]) status = true;
+      if (this.addSessForm.status[0]) status = true;
       const payload = {
-        title: this.addBookForm.title,
-        phone: this.addBookForm.phone,
+        title: this.addSessForm.title,
+        phone: this.addSessForm.phone,
         status, // property shorthand
       };
-      this.addBook(payload);
+      this.addSess(payload);
       this.initForm();
     },
     onReset(evt) {
       evt.preventDefault();
-      this.$refs.addBookModal.hide();
+      this.$refs.addSessModal.hide();
       this.initForm();
     },
-    editBook(book) {
-      this.editForm = book;
+    editSess(sess) {
+      this.editForm = sess;
     },
     onSubmitUpdate(evt) {
       evt.preventDefault();
-      this.$refs.editBookModal.hide();
+      this.$refs.editSessModal.hide();
       let status = false;
       if (this.editForm.status[0]) status = true;
       const payload = {
@@ -213,48 +237,48 @@ export default {
         phone: this.editForm.phone,
         status,
       };
-      this.updateBook(payload, this.editForm.id);
+      this.updateSess(payload, this.editForm.id);
     },
-    updateBook(payload, bookID) {
-      const path = `http://localhost:5000/books/${bookID}`;
+    updateSess(payload, sessID) {
+      const path = `http://localhost:5000/sesss/${sessID}`;
       axios.put(path, payload)
         .then(() => {
-          this.getBooks();
-          this.message = 'Book updated!';
+          this.getSesss();
+          this.message = 'Sess updated!';
           this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
-          this.getBooks();
+          this.getSesss();
         });
     },
     onResetUpdate(evt) {
       evt.preventDefault();
-      this.$refs.editBookModal.hide();
+      this.$refs.editSessModal.hide();
       this.initForm();
-      this.getBooks(); // why?
+      this.getSesss(); // why?
     },
-    removeBook(bookID) {
-      const path = `http://localhost:5000/books/${bookID}`;
+    removeSess(sessID) {
+      const path = `http://localhost:5000/sesss/${sessID}`;
       axios.delete(path)
         .then(() => {
-          this.getBooks();
-          this.message = 'Book removed!';
+          this.getSesss();
+          this.message = 'Sess removed!';
           this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
-          this.getBooks();
+          this.getSesss();
         });
     },
-    onDeleteBook(book) {
-      this.removeBook(book.id);
+    onDeleteSess(sess) {
+      this.removeSess(sess.id);
     },
   },
   created() {
-    this.getBooks();
+    this.getSesss();
   },
 };
 </script>

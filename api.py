@@ -1,21 +1,20 @@
 import base64
 import os
-
 import hypercorn.asyncio
-from quart import Quart, render_template_string, request
-
+from quart import Quart, jsonify, render_template_string, request
+from quart_cors import cors
 import asyncio
 import logging
-
 from telethon.tl.patched import MessageService
 from telethon.errors.rpcerrorlist import FloodWaitError
 from telethon import TelegramClient
 import pymongo
 import uuid
+
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 mydb = myclient["mydatabase"]
 mycol = mydb["customers"]
-mycol.drop()
+forward_col = mydb["forwards"] 
 def get_env(name, message):
     if name in os.environ:
         return os.environ[name]
@@ -75,7 +74,10 @@ list_client = []
 # Quart app
 app = Quart(__name__)
 app.secret_key = 'CHANGE THIS TO SOMETHING SECRET'
+app = cors(app, allow_origin="*")
 
+def process_phone(phone):
+    return phone.replace(" ", "").replace("(", "").replace(")", "")
 
 # Helper method to format messages nicely
 async def format_message(message):
@@ -119,13 +121,21 @@ async def startup():
 
 @app.route('/session', methods=['GET', 'POST'])
 async def all_session():
-    count = 0
-    for x in mycol.find({"status": 1}):
-        count+=1
-    result = '<h1>{} {}</h1>'.format(count, "connected")
-    return await render_template_string(BASE_TEMPLATE, content=result)
+    list_session = []
+    response_object = {'status': 'success'}
+    for x in mycol.find({}):
+        list_session.append({
+            "session_id": x.get("name", "#"),
+            "phone": x.get("phone", "#"),
+            "title": x.get("title", "#"),
+            "status": x.get("status", "#")
+        })
+    response_object['sesss'] = list_session
+    return jsonify(response_object)
 
-@app.route('/', methods=['GET', 'POST'])
+
+
+@app.route('/add_sess', methods=['GET', 'POST'])
 async def root():
     # We want to update the global phone variable to remember it
     global phone
@@ -137,48 +147,86 @@ async def root():
         await client.connect()
     # Check form parameters (phone/code)
     form = await request.form
+    response_object = {'status': 0}
     if 'phone' in form:
+        title = form['title']
         phone = form['phone']
-        q_phone = phone.replace(" ", "").replace("(", "").replace(")", "")
-        for x in mycol.find({"status": 1, "phone": q_phone}):
-            if phone == x["phone"]:
-                phone = None
-                return await render_template_string(BASE_TEMPLATE, content="session running")
-        try:
-            await client.send_code_request(phone)
-            phone = q_phone
-        except:
+        phone = process_phone(phone)
+        response_object.update({"phone": phone})
+        phone_key = phone.replace("+", "")
+        for x in mycol.find({"status": 1, "phone": phone_key}):
             phone = None
-    if 'code' in form:
-        try:
-            await client.sign_in(code=form['code'])
-        except SessionPasswordNeededError:
-            return await render_template_string(BASE_TEMPLATE, content=PASSWORD_FORM)
-
-    if 'password' in form:
-        await client.sign_in(password=form['password'])
-
-    # If we're logged in, show them some messages from their first dialog
-    if await client.is_user_authorized():
-        # They are logged in, show them some messages from their first dialog
-        # dialog = (await client.get_dialogs())[0]
-        list_client.append(client)
-        mydict = { "name": SESSION, "phone": phone, "status": 1 }
+            response_object.update({"message": "Client is running!"})
+            return jsonify(response_object)
+        await client.send_code_request(phone)
+        mydict = { "phone": phone_key, "name": SESSION, "title": title,  "status": 0 }
+        mycol.insert_one(mydict)
         SESSION = str(uuid.uuid4().hex)
-        result = '<h1>{} {}</h1>'.format(len(list_client), "connected")
-        x = mycol.insert_one(mydict)
-        # async for m in client.get_messages(dialog, 10):
-        #     result += await(format_message(m))
-        client = None
-        phone = None
-        return await render_template_string(BASE_TEMPLATE, content=result)
+        response_object.update({"status": 1, "message": "Client is running!"})
 
-    # Ask for the phone if we don't know it yet
-    if phone is None:
-        return await render_template_string(BASE_TEMPLATE, content=PHONE_FORM)
+    return jsonify(response_object)
+    
+     
 
-    # We have the phone, but we're not logged in, so ask for the code
-    return await render_template_string(BASE_TEMPLATE, content=CODE_FORM)
+    # # If we're logged in, show them some messages from their first dialog
+    # if await client.is_user_authorized():
+    #     # They are logged in, show them some messages from their first dialog
+    #     # dialog = (await client.get_dialogs())[0]
+    #     list_client.append(client)
+    #     mydict = { "name": SESSION, "phone": phone, "status": 1 }
+    #     SESSION = str(uuid.uuid4().hex)
+    #     result = '<h1>{} {}</h1>'.format(len(list_client), "connected")
+    #     x = mycol.insert_one(mydict)
+    #     # async for m in client.get_messages(dialog, 10):
+    #     #     result += await(format_message(m))
+    #     client = None
+    #     phone = None
+    #     return await render_template_string(BASE_TEMPLATE, content=result)
+
+    # # Ask for the phone if we don't know it yet
+    # if phone is None:
+    #     return await render_template_string(BASE_TEMPLATE, content=PHONE_FORM)
+
+    # # We have the phone, but we're not logged in, so ask for the code
+    # return await render_template_string(BASE_TEMPLATE, content=CODE_FORM)
+
+
+@app.route('/verify-code', methods=['GET', 'POST'])
+async def verifycode():
+    # We want to update the global phone variable to remember it
+    global phone
+    global client
+    global SESSION
+    if client is None:
+        # Telethon client
+        client = TelegramClient(SESSION, API_ID, API_HASH)
+        await client.connect()
+    form = await request.form
+    if 'code' in form:
+        await client.sign_in(code=form['code'])
+        if await client.is_user_authorized():
+            phone = form['phone']
+            filter = { 'phone': process_phone(phone).replace("+", "") }
+            # Values to be updated.
+            newvalues = { "$set": { 'status': 1 } }
+            # Using update_one() method for single
+            # updation.
+            mycol.update_one(filter, newvalues)
+            SESSION = str(uuid.uuid4().hex)
+            client = None
+            phone = None
+            return jsonify({"phone": phone, "status": 1})
+        return jsonify({"phone": phone, "status": 0})
+    
+@app.route('/add_foward', methods=['GET', 'POST'])
+async def setting_foward():
+    form = await request.form
+    phone = form['phone']
+    phone_key = process_phone(phone).replace("+", "")
+    mess_from = form["from"]
+    mess_to = form["to"]
+    mydict = { "phone": phone_key, "from": mess_from,  "to": mess_to }
+    forward_col.insert_one(mydict)
 
 
 async def main():
