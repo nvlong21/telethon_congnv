@@ -201,22 +201,23 @@ async def verifycode():
         # Telethon client
         client = TelegramClient(SESSION, API_ID, API_HASH)
         await client.connect()
+    response_object = {'status': 0}
     form = await request.form
     if 'code' in form:
         await client.sign_in(code=form['code'])
         if await client.is_user_authorized():
             phone = form['phone']
+            response_object.update({"phone": phone})
             filter = { 'phone': process_phone(phone).replace("+", "") }
-            # Values to be updated.
             newvalues = { "$set": { 'status': 1 } }
-            # Using update_one() method for single
-            # updation.
             mycol.update_one(filter, newvalues)
             SESSION = str(uuid.uuid4().hex)
             client = None
             phone = None
-            return jsonify({"phone": phone, "status": 1})
-        return jsonify({"phone": phone, "status": 0})
+            response_object.update({"status": 1, "message": "sussess"})
+            return jsonify(response_object)
+    
+    return jsonify({"status": 0, "message": "error"})
     
 @app.route('/add_foward', methods=['GET', 'POST'])
 async def setting_foward():
