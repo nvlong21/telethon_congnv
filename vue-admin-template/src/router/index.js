@@ -84,6 +84,12 @@ export const constantRoutes = [
         name: 'TeleAccount',
         component: () => import('@/views/table/teleacounts'),
         meta: { title: 'Tele Account', icon: 'table' }
+      },
+      {
+        path: 'crawl-process',
+        name: 'CrawlProcess',
+        component: () => import('@/views/table/crawlprocess'),
+        meta: { title: 'Crawl Process', icon: 'table' }
       }
     ]
   },

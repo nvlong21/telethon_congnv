@@ -14,9 +14,9 @@
         </el-form-item>
       </el-form>
     </div>
-    <div v-if="open_code" class="overlay" @click="open_code = false"></div>
+    <div v-if="open_code" class="overlay" @click="open_code = true"></div>
     <div v-if="open_code" class="modal">
-      <button class="close" @click="open_code = false">x</button>
+      <button class="close" @click="open_code = true">x</button>
       <h3>Verify code</h3>
       <el-form ref="form" :model="telesession" label-width="120px">
         <el-form-item label="Code">
@@ -57,11 +57,6 @@
         fit
         highlight-current-row
       >
-        <el-table-column align="center" label="ID" width="95">
-          <template slot-scope="scope">
-            {{ scope.$index }}
-          </template>
-        </el-table-column>
         <el-table-column label="ID">
           <template slot-scope="scope">
             {{ scope.row.id }}
@@ -75,6 +70,11 @@
         <el-table-column label="Task" width="110" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.task }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="Category" width="110" align="center">
+          <template slot-scope="scope">
+            <span>{{ scope.row.category }}</span>
           </template>
         </el-table-column>
         <el-table-column label="Status" width="110" align="center">

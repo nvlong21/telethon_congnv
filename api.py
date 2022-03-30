@@ -182,6 +182,7 @@ async def root():
         phone = post_data.get('phone')
         code = post_data.get("code")
         task_id = post_data.get("task_id")
+        cate_id = post_data.get('category_id')
         phone = process_phone(phone)
         response_object.update({"phone": phone})
         phone_key = phone.replace("+", "")
@@ -200,7 +201,7 @@ async def root():
                 return jsonify(response_object)
         elif task_id is not None:
             filter = { 'phone': phone_key }
-            newvalues = { "$set": { "task_id": task_id } }
+            newvalues = { "$set": { "task_id": task_id , "category_id": cate_id} }
             db_account.update_one(filter, newvalues)
             # task_id = post_data.get('task_id')
             # cate_id = post_data.get('category_id')
@@ -222,7 +223,7 @@ async def root():
                 else:
                     task_id = post_data.get('task_id')
                     cate_id = post_data.get('category_id')
-                    new_dict = { "$set": {"phone": phone_key, "task_id": task_id }}
+                    new_dict = { "$set": {"phone": phone_key, "task_id": task_id , "category_id": cate_id}}
                     query = { "name":  phone_key}
                     x = db_account.update_many(query, new_dict)
                     response_object.update({"status": 1, "message": "All done!"})
@@ -241,15 +242,17 @@ async def root():
         response_object = {'status': 'success'}
         for x in db_account.find({}):
             task = db_task.find_one({"id": x.get("task_id") })
-            task_name = "#"
-            if task is not None:
-                task_name = task.get("name", "#")
-            list_session.append({
+            category = db_cate.find_one({"id": x.get("category_id")})
+            data = {
                 "id": x.get("name", "#"),
                 "phone": x.get("phone", "#"),
-                "task": task_name,
                 "status": x.get("status", "#")
-            })
+            }
+            if task is not None:
+                data.update({"task": task.get("name", "#")})
+            if category is not None:
+                data.update({"category": category.get("name", "#")})
+            list_session.append(data)
         return jsonify(list_session)
 
     
