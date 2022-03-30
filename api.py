@@ -8,82 +8,15 @@ import logging
 from telethon.tl.patched import MessageService
 from telethon.errors.rpcerrorlist import FloodWaitError
 from telethon import TelegramClient
-import pymongo
+from mongo import *
 import uuid
-
-myclient = pymongo.MongoClient("mongodb://localhost:27017/")
-mydb = myclient["mydatabase"]
-db_account = mydb["accounts"]
-db_cate = mydb["categories"]
-db_cate_world = mydb["categories_words"]
-db_keyword = mydb["db_keyword"]
-db_replaceword = mydb["db_replaceword"]
-db_cate.drop()
-db_account.drop()
-mydict = { "id": str(uuid.uuid4().hex), "name": "coin", "type_id": "1", "cate_for": "account"}
-db_cate.insert_one(mydict)
-mydict = { "id": str(uuid.uuid4().hex), "name": "bit coin", "type_id": "2", "cate_for": "account"}
-db_cate.insert_one(mydict)
-mydict = { "id": str(uuid.uuid4().hex), "name": "Key Word", "type_id": "3", "cate_for": "filter"}
-db_cate.insert_one(mydict)
-mydict = { "id": str(uuid.uuid4().hex), "name": "Replace", "type_id": "4", "cate_for": "filter"}
-db_cate.insert_one(mydict)
-
-db_keyword.drop()
-mydict = { "id": str(uuid.uuid4().hex), "keyword": "keyword", "category_id": "52d8151df4f344bba4b5c56974213dbd"}
-db_keyword.insert_one(mydict)
-
-mydict = { "id": str(uuid.uuid4().hex), "word": "keyword", "word": "asaasda", "category_id": "52d8151df4f344bba4b5c56974213dbd"}
-db_replaceword.insert_one(mydict)
-# mydict = { "id": "52d8151df4f344bba4b5c56974213dbd", "name": "BitCoin"}
-# db_cate_world.insert_one(mydict)
-db_task = mydb["tasks"]
-db_task.insert_one({"id": "1", "name": "Crawl", "cate_for": "account"})
-db_task.insert_one({"id": "2", "name": "Post", "cate_for": "account"})
-db_task.insert_one({"id": "3", "name": "Key Word", "cate_for": "filter"})
-db_task.insert_one({"id": "4", "name": "Replace", "cate_for": "filter"})
 
 # tele_account = mydb["accounts"] 
 def get_env(name, message):
     if name in os.environ:
         return os.environ[name]
     return input(message)
-# class TeleCl:
-#     def __init__(self):
-#         self.client = None
 
-# tele_cl = TeleCl()
-BASE_TEMPLATE = '''
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset='UTF-8'>
-        <title>Telethon + Quart</title>
-    </head>
-    <body>{{ content | safe }}</body>
-</html>
-'''
-
-PHONE_FORM = '''
-<form action='/' method='post'>
-    Phone (international format): <input name='phone' type='text' placeholder='+34600000000'>
-    <input type='submit'>
-</form>
-'''
-
-CODE_FORM = '''
-<form action='/' method='post'>
-    Telegram code: <input name='code' type='text' placeholder='70707'>
-    <input type='submit'>
-</form>
-'''
-
-PASSWORD_FORM = '''
-<form action='/' method='post'>
-    Telegram password: <input name='password' type='text' placeholder='your password'>
-    <input type='submit'>
-</form>
-'''
 
 # Session name, API ID and hash to use; loaded from environmental variables
 # SESSION = os.environ.get('TG_SESSION', 'quart')
@@ -92,7 +25,7 @@ PASSWORD_FORM = '''
 
 API_ID = "14225107" #os.getenv('api_id')
 API_HASH = "bc6b2686eea4dc38f72181dd8d279dbf" #os.getenv('api_hash')
-SESSION =  str(uuid.uuid4().hex)#os.getenv('STRING_SESSION')
+SESSION =  "84986626975"#os.getenv('STRING_SESSION')
 
 # Render things nicely (global setting)
 # Message.set_default_parse_mode('html')
@@ -130,7 +63,7 @@ async def format_message(message):
 @app.before_serving
 async def startup():
     global list_client
-    for x in db_account.find({"status": 1}):
+    for x in DB_ACCOUNT.find({"status": 1}):
         print(x)
         session = x["name"]
         cl = TelegramClient(session, API_ID, API_HASH)
@@ -140,7 +73,7 @@ async def startup():
         else:
             myquery = { "name":  session}
             newvalues = { "$set": { "status": 0 } }
-            x = db_account.update_many(myquery, newvalues)
+            x = DB_ACCOUNT.update_many(myquery, newvalues)
 
 
 # # After we're done serving (near shutdown), clean up the client
@@ -152,7 +85,7 @@ async def startup():
 async def all_session():
     list_session = []
     response_object = {'status': 'success'}
-    for x in db_account.find({}):
+    for x in DB_ACCOUNT.find({}):
         list_session.append({
             "session_id": x.get("name", "#"),
             "phone": x.get("phone", "#"),
@@ -193,7 +126,7 @@ async def root():
                 response_object.update({"phone": phone})
                 filter = { 'phone': phone_key }
                 newvalues = { "$set": { 'status': 1 } }
-                db_account.update_one(filter, newvalues)
+                DB_ACCOUNT.update_one(filter, newvalues)
                 SESSION = str(uuid.uuid4().hex)
                 client = None
                 phone = None
@@ -202,16 +135,16 @@ async def root():
         elif task_id is not None:
             filter = { 'phone': phone_key }
             newvalues = { "$set": { "task_id": task_id , "category_id": cate_id} }
-            db_account.update_one(filter, newvalues)
+            DB_ACCOUNT.update_one(filter, newvalues)
             # task_id = post_data.get('task_id')
             # cate_id = post_data.get('category_id')
             # new_dict = { "phone": phone_key, "task_id": task_id }
             # query = { "name":  phone_key}
-            # x = db_account.update_many(query, new_dict)
+            # x = DB_ACCOUNT.update_many(query, new_dict)
             response_object.update({"status": 1, "message": "All done!"})
             return jsonify(response_object)
         else:
-            x = db_account.find_one({"phone": phone_key})
+            x = DB_ACCOUNT.find_one({"phone": phone_key})
             if x is not None:
                 if x.get("status", 0):
                     new_client = TelegramClient(x.get("name"), API_ID, API_HASH)
@@ -225,12 +158,12 @@ async def root():
                     cate_id = post_data.get('category_id')
                     new_dict = { "$set": {"phone": phone_key, "task_id": task_id , "category_id": cate_id}}
                     query = { "name":  phone_key}
-                    x = db_account.update_many(query, new_dict)
+                    x = DB_ACCOUNT.update_many(query, new_dict)
                     response_object.update({"status": 1, "message": "All done!"})
                     return jsonify(response_object)
             await client.send_code_request(phone)
             mydict = { "name": SESSION, "phone": phone_key, "status": 0 }
-            db_account.insert_one(mydict)
+            DB_ACCOUNT.insert_one(mydict)
             SESSION = str(uuid.uuid4().hex)
             response_object.update({"status": 1, "message": "Send code done!"})
             return jsonify(response_object)
@@ -240,9 +173,9 @@ async def root():
     else:
         list_session = []
         response_object = {'status': 'success'}
-        for x in db_account.find({}):
+        for x in DB_ACCOUNT.find({}):
             task = db_task.find_one({"id": x.get("task_id") })
-            category = db_cate.find_one({"id": x.get("category_id")})
+            category = DB_CATEGORIES.find_one({"id": x.get("category_id")})
             data = {
                 "id": x.get("name", "#"),
                 "phone": x.get("phone", "#"),
@@ -266,7 +199,7 @@ async def root():
     #     mydict = { "name": SESSION, "phone": phone, "status": 1 }
     #     SESSION = str(uuid.uuid4().hex)
     #     result = '<h1>{} {}</h1>'.format(len(list_client), "connected")
-    #     x = db_account.insert_one(mydict)
+    #     x = DB_ACCOUNT.insert_one(mydict)
     #     # async for m in client.get_messages(dialog, 10):
     #     #     result += await(format_message(m))
     #     client = None
@@ -300,7 +233,7 @@ async def verifycode():
             response_object.update({"phone": phone})
             filter = { 'phone': process_phone(phone).replace("+", "") }
             newvalues = { "$set": { 'status': 1 } }
-            db_account.update_one(filter, newvalues)
+            DB_ACCOUNT.update_one(filter, newvalues)
             SESSION = str(uuid.uuid4().hex)
             client = None
             phone = None
@@ -320,7 +253,7 @@ async def verifycode():
 #         phone_key = phone.replace("+", "")
 #         new_dict = { "phone": phone_key, "task_id": mess_from,  "cate_id": mess_to }
 #         query = { "name":  phone_key}
-#         x = db_account.update_many(query, new_dict)
+#         x = DB_ACCOUNT.update_many(query, new_dict)
 #         return jsonify(response_object)
 
 @app.route('/task', methods=['GET', 'POST'])
@@ -335,7 +268,7 @@ async def categories():
         cate_name = post_data.get("name")
         type_id = post_data.get("type_id")
         mydict = { "id": str(uuid.uuid4().hex), "name": cate_name, "type_id": type_id}
-        db_cate.insert_one(mydict)
+        DB_CATEGORIES.insert_one(mydict)
         response_object = {'status': 1}
         return jsonify(response_object)
     else:
@@ -348,7 +281,7 @@ async def categories():
         cate_for = data.get("cate_for")
         if cate_for is not None:
             query.update({"cate_for": cate_for})
-        list_cates = list(db_cate.find(query))
+        list_cates = list(DB_CATEGORIES.find(query))
         # print(query)
         for x in list_cates:
             if x.get("type_id") is None:
@@ -368,12 +301,12 @@ async def categories():
 #         post_data = await request.get_json()
 #         cate_name = post_data.get("name")
 #         mydict = { "id": str(uuid.uuid4().hex), "name": cate_name}
-#         db_cate_world.insert_one(mydict)
+#         DB_CATEGORIES_world.insert_one(mydict)
 #         response_object = {'status': 1}
 #         return jsonify(response_object)
 #     else:
 #         list_cates = []
-#         for x in db_cate_world.find({}):
+#         for x in DB_CATEGORIES_world.find({}):
 #             list_cates.append({
 #                 "id": x.get("id"),
 #                 "name": x.get("name"),
@@ -390,20 +323,20 @@ async def keyword():
         if keywords is not None:
             for keyword in keywords:
                 mydict = { "id": str(uuid.uuid4().hex), "keyword": keyword, "category_id": cate_id}
-                db_keyword.insert_one(mydict)
+                DB_KEYWORD.insert_one(mydict)
         response_object = {'status': 1}
         return jsonify(response_object)
     else:
         get_data = request.args.to_dict(flat=True)
         cat_id = get_data.get("cat_id")
         if cat_id is not None:
-            list_keyword = list(db_keyword.find({"category_id": cat_id}))
+            list_keyword = list(DB_KEYWORD.find({"category_id": cat_id}))
         else:
-            list_keyword = list(db_keyword.find({}))
+            list_keyword = list(DB_KEYWORD.find({}))
         category_name = ""
         list_results = []
         for x in list_keyword:
-            category = db_cate.find_one({"id": x["category_id"]})
+            category = DB_CATEGORIES.find_one({"id": x["category_id"]})
             if category is not None:
                 category_name = category.get("name")
                 x["category"] = category_name
@@ -421,20 +354,20 @@ async def replace_words():
         replace = post_data.get("replace")
         cate_id = post_data.get("cate_id")
         mydict = { "id": str(uuid.uuid4().hex), "word": word, "replace": replace, "category_id": cate_id}
-        db_replaceword.insert_one(mydict)
+        DB_REPLACE_WORD.insert_one(mydict)
         response_object = {'status': 1}
         return jsonify(response_object)
     else:
         get_data = request.args
         cat_id = get_data.get("cat_id")
         if cat_id is not None:
-            list_keyword = list(db_replaceword.find({"category_id": cat_id}))
+            list_keyword = list(DB_REPLACE_WORD.find({"category_id": cat_id}))
         else:
-            list_keyword = list(db_replaceword.find({}))
+            list_keyword = list(DB_REPLACE_WORD.find({}))
         category_name = ""
         list_results = []
         for x in list_keyword:
-            category = db_cate.find_one({"id": x["category_id"]})
+            category = DB_CATEGORIES.find_one({"id": x["category_id"]})
             if category is not None:
                 category_name = category.get("name")
                 x["category"] = category_name
