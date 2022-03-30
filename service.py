@@ -10,6 +10,7 @@ from telethon.errors.rpcerrorlist import FloodWaitError
 from telethon import TelegramClient
 import pymongo
 import uuid
+import random
 import copy.deepcopy as deepcopy
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 mydb = myclient["mydatabase"]
@@ -63,6 +64,7 @@ phone = None
 list_client = []
 class TeleProcess:
     def __init__(self):
+        self.categories_crawl = {}
         self.dict_client_crawl = {}
         self.dict_client_post = {}
         self.dict_crawls = {}
@@ -71,34 +73,38 @@ class TeleProcess:
         self.dict_posts = {}
     def run(self):
         while 1:
-
-            for k in deepcopy(self.dict_client_crawl).keys():
-                client = self.dict_client_crawl.get(k)
-                if (client is None) or (not await client.is_user_authorized()):
-                    continue
-                
-                for 
-                # for forward in forwards:
-                from_chat, offset = get_forward(forward)
-
-                if not offset:
-                    offset = 0
-
-                last_id = 0
-
-                async for message in client.iter_messages(intify(from_chat), reverse=True, offset_id=offset):
-                    if isinstance(message, MessageService):
-                        continue
-                    try:
-                        await client.send_message(intify(to_chat), message)
-                        last_id = str(message.id)
-                        logging.info('forwarding message with id = %s', last_id)
-                        update_offset(forward, last_id)
-                    except FloodWaitError as fwe:
-                        print(f'{fwe}')
-                        asyncio.sleep(delay=fwe.seconds)
-                    except Exception as err:
-                        logging.exception(err)
-                        error_occured = True
+            for k in deepcopy(self.categories_crawl).keys():
+                category_crawl = self.categories_crawl.get(k)
+                lst_clients = category_crawl.get("clients")
+                client = None
+                for cl in lst_clients:
+                    if (cl is not None) or (await cl.is_user_authorized()):
+                        client = cl
                         break
+                if (client is None) or (not await client.is_user_authorized()): 
+                    continue
+                lst_from_chat = category_crawl.get("from_chats")
+                for dict_from_chat in lst_dict_from_chat:
+                    from_chat = dict_from_chat.get("from_chat")
+                    offset = dict_from_chat.get("offset")
+                    if not offset:
+                        offset = 0
+
+                    last_id = 0
+
+                    async for message in client.iter_messages(intify(from_chat), reverse=True, offset_id=offset):
+                        if isinstance(message, MessageService):
+                            continue
+                        try:
+                            await client.send_message(intify(to_chat), message)
+                            last_id = str(message.id)
+                            logging.info('forwarding message with id = %s', last_id)
+                            update_offset(forward, last_id)
+                        except FloodWaitError as fwe:
+                            print(f'{fwe}')
+                            asyncio.sleep(delay=fwe.seconds)
+                        except Exception as err:
+                            logging.exception(err)
+                            error_occured = True
+                            break
 
