@@ -4,17 +4,18 @@ import asyncio
 import logging
 from telethon.tl.patched import MessageService
 from telethon.errors.rpcerrorlist import FloodWaitError
-from telethon.sync import TelegramClient
+from telethon import TelegramClient
 from mongo import *
 import uuid
 import random
-import dill as pickle
+
 from  copy import deepcopy 
 import time
 from multiprocessing.dummy import Process, Queue
 import re
-import nest_asyncio
-nest_asyncio.apply()
+import threading
+# import nest_asyncio
+# nest_asyncio.apply()
 def get_env(name, message):
     if name in os.environ:
         return os.environ[name]
@@ -65,10 +66,6 @@ class TeleProcess:
     def __init__(self):
         self.categories_crawl = {}
         self.categories_post = {}
-        self.loop = asyncio.get_event_loop()
-        self.loop.run_until_complete(self.initial_crawl())
-        
-        self.loop.run_until_complete(self.initial_post())
         self.queue_mess =  Queue(maxsize = 100)
     async def initial_crawl(self):
         print("initial_crawl")
@@ -146,10 +143,11 @@ class TeleProcess:
                     "replaces": lst_replace_word
                 })
             self.categories_crawl[cate_id]["from_chats"] = lst_dict_crawl
-        
+        print("initial_crawl")
         await asyncio.sleep(0.1)
 
     async def initial_post(self):
+        print("initial_post")
         categories_post = DB_CATEGORIES.find({"type_id": str(POSTER)})
         for category in list(categories_post):
             cate_id = category.get("id")
@@ -195,7 +193,6 @@ class TeleProcess:
 
             categories_id = message.get("categories_id")
             content = message.get("content")
-            print(content)
             for k in categories_id:
                 category_post = self.categories_post.get(k)
                 lst_clients = category_post.get("clients")
@@ -212,7 +209,8 @@ class TeleProcess:
                 for post_to in lst_post_to:
                     
                     try:
-                        client1.send_message("me", content)
+                        async with client1:
+                            await client1.send_message("me", content)
                         
                         logging.info('forwarding message')
                         # update_offset(forward, last_id)
@@ -228,7 +226,8 @@ class TeleProcess:
             
     async def Crawl(self):
         while 1:
-            await asyncio.sleep(delay=0.01)
+            await asyncio.sleep(0.01)
+            print("a")
             categories_keys = list(self.categories_crawl.keys()).copy()
             categories_cp = {}
             for k in categories_keys:
@@ -262,13 +261,11 @@ class TeleProcess:
                     last_id = 0
                     
                     async for message in client.iter_messages(intify(from_chat), reverse=True, offset_id=offset):
-                        
                         if isinstance(message, MessageService):
                             continue
-
-                        content = process_message(message, filters, replaces)
-                        message.text = content + "1"
-                        print(message.text)
+                        print('Working with')
+                        # content = process_message(message, filters, replaces)
+                        # message.text = content + "1"
                         self.queue_mess.put(
                             {
                                 "categories_id": lst_post_to_category,
@@ -287,24 +284,33 @@ class TeleProcess:
                         #     error_occured = True
                         #     break
 
+def get_or_create_eventloop():
+    try:
+        return asyncio.get_event_loop()
+    except RuntimeError as ex:
+        if "There is no current event loop in thread" in str(ex):
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            return asyncio.get_event_loop()
+def run(tele): 
+    print("asda")
+    loop = get_or_create_eventloop()
+    future = asyncio.ensure_future(tele.Crawl())
+    loop.run_until_complete(future)
+def run2(tele): 
+    print("asda")
+    loop = get_or_create_eventloop()
+    future = asyncio.ensure_future(tele.Sender())
+    loop.run_until_complete(future)
 
-tele = TeleProcess()
-loop = asyncio.get_event_loop()
-Process(target=lambda:loop.run_until_complete(tele.Crawl())).start()
-loop = asyncio.new_event_loop()
-asyncio.set_event_loop(loop)
-loop = asyncio.get_event_loop()
-Process(target=lambda:loop.run_until_complete(tele.Sender())).start()
-# print("a")
-# print("sender")
-# Process(target=lambda: asyncio.run(tele.Sender())).start()
 
-# # Process().start()
-# Process(target=lambda: asyncio.run(tele.Crawl())).start()
-# async def main():
-#     tele = TeleProcess()
-#     await asyncio.gather(
-#         tele.Crawl(),
-#         tele.Sender()
-#     )
-# asyncio.run(main())
+async def main():
+    tele = TeleProcess()
+
+    await asyncio.gather(
+        tele.initial_crawl(),
+        tele.initial_post(),
+        tele.Crawl(),
+        tele.Sender(),
+    )
+asyncio.run(main())
