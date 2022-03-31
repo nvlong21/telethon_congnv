@@ -26,6 +26,10 @@ DB_POST.drop()
 mydict = { "id": str(uuid.uuid4().hex), "name": "84986626975", "task_id": str(CRAWL), "category_id": "52d8151df4f344bba4b5c56974213daa"}
 DB_ACCOUNT.insert_one(mydict)
 
+mydict = { "id": str(uuid.uuid4().hex), "name": "84337590196", "task_id": str(POSTER), "category_id": "52d8151df4f344bba4b5c56974213dap"}
+DB_ACCOUNT.insert_one(mydict)
+
+
 mydict = { "id": "52d8151df4f344bba4b5c56974213daa", "from": "https://t.me/CoinMarketCap", "type": "chanel", "category_id": "52d8151df4f344bba4b5c56974213daa",
             "category_keyword_id": "52d8151df4f344bba4b5c56974213dac", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
             "category_replace_id": "52d8151df4f344bba4b5c56974213dar", "offset": 0}
