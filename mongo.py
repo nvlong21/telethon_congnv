@@ -26,22 +26,29 @@ DB_POST.drop()
 mydict = { "id": str(uuid.uuid4().hex), "name": "84986626975", "task_id": str(CRAWL), "category_id": "52d8151df4f344bba4b5c56974213daa"}
 DB_ACCOUNT.insert_one(mydict)
 
-mydict = { "id": str(uuid.uuid4().hex), "name": "84337590196", "task_id": str(POSTER), "category_id": "52d8151df4f344bba4b5c56974213dap"}
+# mydict = { "id": str(uuid.uuid4().hex), "name": "84337590196", "task_id": str(CRAWL), "category_id": "62d8151df4f344bba4b5c56974213daa"}
+# DB_ACCOUNT.insert_one(mydict)
+
+
+mydict = { "id": str(uuid.uuid4().hex), "name": "84925905936", "task_id": str(POSTER), "category_id": "52d8151df4f344bba4b5c56974213dap"}
 DB_ACCOUNT.insert_one(mydict)
 
 
-mydict = { "id": "52d8151df4f344bba4b5c56974213daa", "from": "https://t.me/CoinMarketCap", "type": "chanel", "category_id": "52d8151df4f344bba4b5c56974213daa",
+mydict = { "id": "52d8151df4f344bba4b5c56974213daa", "from": "https://t.me/CoinMarketCap", "type": "chanel", "category_id": "coin",
             "category_keyword_id": "52d8151df4f344bba4b5c56974213dac", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
             "category_replace_id": "52d8151df4f344bba4b5c56974213dar", "offset": 0}
 DB_CRAWL.insert_one(mydict)
-mydict = { "id": "52d8151df4f344bba4b5c56974213daa", "from": "https://t.me/Tojecoin2022", "type": "chanel", "category_id": "52d8151df4f344bba4b5c56974213daa",
+mydict = { "id": "52d8151df4f344bba4c5c56974213daa", "from": "https://t.me/Tojecoin2022", "type": "chanel", "category_id": "62d8151df4f344bba4b5c56974213daa",
             "category_keyword_id": "52d8151df4f344bba4b5c56974213dac", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
             "category_replace_id": "52d8151df4f344bba4b5c56974213dar", "offset": 0}
 DB_CRAWL.insert_one(mydict)
 
 
-mydict = { "id": "52d8151df4f344bba4b5c56974213daa", "name": "coin", "type_id": "1", "cate_for": "account"}
+mydict = { "id": "coin", "name": "coin", "type_id": "1", "cate_for": "account"}
 DB_CATEGORIES.insert_one(mydict)
+mydict = { "id": "62d8151df4f344bba4b5c56974213daa", "name": "Bit coin", "type_id": "1", "cate_for": "account"}
+DB_CATEGORIES.insert_one(mydict)
+
 mydict = { "id": "52d8151df4f344bba4b5c56974213dap", "name": "bit coin", "type_id": "2", "cate_for": "account"}
 DB_CATEGORIES.insert_one(mydict)
 mydict = { "id": "52d8151df4f344bba4b5c56974213dac", "name": "Key Word", "type_id": "3", "cate_for": "filter"}

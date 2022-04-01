@@ -5,7 +5,7 @@ import logging
 
 from telethon.tl.patched import MessageService
 from telethon.errors.rpcerrorlist import FloodWaitError
-from telethon import TelegramClient
+from telethon.sync import TelegramClient
 from telethon.sessions import StringSession
 from settings import API_ID, API_HASH, forwards, get_forward, update_offset, STRING_SESSION
 
@@ -29,7 +29,7 @@ async def forward_job():
         session = StringSession(STRING_SESSION)
     else:
         session = '84986626975'
-    client = TelegramClient('84986626975', API_ID, API_HASH)
+    client = TelegramClient('84925905936', API_ID, API_HASH)
     await client.connect()
     # async with TelegramClient(session, API_ID, API_HASH) as client:
     #     list_client.append(client)
@@ -47,15 +47,16 @@ async def forward_job():
     for client in list_client:
         for forward in forwards:
             from_chat, to_chat, offset = get_forward(forward)
-
+            print(from_chat, to_chat, offset)
             if not offset:
                 offset = 0
 
             last_id = 0
 
-            async for message in client.iter_messages(intify(from_chat), reverse=True, offset_id=offset):
+            async for message in client.iter_messages(intify(from_chat), reverse=True, offset_id=0):
                 if isinstance(message, MessageService):
                     continue
+
                 try:
                     await client.send_message(intify(to_chat), message)
                     last_id = str(message.id)
