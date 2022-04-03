@@ -201,6 +201,12 @@ async def root():
 #     return jsonify({"status": 0, "message": "error"})
 
 
+@app.route('/init-exam', methods=['GET', 'POST'])
+async def init_exam():
+    test_db()
+    return jsonify({"status": 1})
+
+
 @app.route('/task', methods=['GET', 'POST'])
 async def taks():
     return jsonify({"id": 1, "name": "Crawl"}, {"id": 2, "name": "Poster"})
