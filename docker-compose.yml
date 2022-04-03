@@ -1,0 +1,33 @@
+version: '2'
+services:
+  api:
+    build: api
+    ports:
+    - "8001:8001"
+    environment:
+      MONGO: mongodb://mongo:27017/
+    # volumes:
+    # - .:/opt
+    links:
+    - mongo
+  mongo:
+    image: bitnami/mongodb
+    # environment:
+    #   MONGO_INITDB_ROOT_USERNAME: root
+    #   MONGO_INITDB_ROOT_PASSWORD: Secret
+    # volumes:
+    #   - mongo-data:/data/db
+    #   - mongo-configdb:/data/configdb
+    ports:
+    - "27017:27017"
+  client:
+    build: vue-admin
+    ports:
+    - "8080:8080"
+    - "8002:8002"
+    - "8003:8003"
+    links:
+    - api
+volumes:
+  mongo-data:
+  mongo-configdb:
