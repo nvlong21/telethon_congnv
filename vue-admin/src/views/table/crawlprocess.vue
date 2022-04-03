@@ -137,6 +137,10 @@ export default {
         })
       }
       fetch('http://localhost:8001/craw-process', requestOptions).then(async response => {
+        fetch('http://localhost:8001/reload-db').then(async response => {
+          const datas = await response.json()
+          console.log(datas)
+        })
         this.$router.go(this.$router.currentRoute)
       })
     },

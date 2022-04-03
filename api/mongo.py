@@ -19,7 +19,16 @@ DB_REPLACE_WORD = DB_FORWARD_CHAT["replace_words"]
 DB_CRAWL = DB_FORWARD_CHAT["crawls"]
 DB_POST = DB_FORWARD_CHAT["posts"]
 DB_TASK = DB_FORWARD_CHAT["tasks"]
-
+def drop_all():
+    DB_ACCOUNT.drop()
+    DB_CATEGORIES.drop()
+    DB_KEYWORD.drop()
+    DB_REPLACE_WORD.drop()
+    DB_CRAWL.drop()
+    DB_TASK.drop()
+    DB_POST.drop()
+    
+drop_all()
 mydict = { "id": str(uuid.uuid4().hex), "phone": "84925905936", "task_id": str(CRAWL), "category_id": "coin", "status": 1}
 DB_ACCOUNT.insert_one(mydict)
 

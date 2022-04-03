@@ -63,33 +63,44 @@ def process_message(message, filters, replaces):
     #     content,
     #     message.date
     # )
+CLIENTS = {}
 CATEGORY_CRAWL = {}
 CATEGORY_POST = {}
 QUEUE_MESS =  Queue(maxsize = 100)
-
-async def initial_crawl():
-    print("initial_crawl")
+INIT = False
+SENDING = False
+async def initial():
+    # if RUNNING
+    global CLIENTS
     global CATEGORY_CRAWL
     global CATEGORY_POST
-
+    global CATEGORY_CRAWL
+    global CATEGORY_POST
+    CATEGORY_CRAWL_TEMP = {}
     categories_crawl = DB_CATEGORIES.find({"type_id": str(CRAWL)})
     for category in list(categories_crawl):
         cate_id = category.get("id")
-        CATEGORY_CRAWL[cate_id] = {}
+        CATEGORY_CRAWL_TEMP[cate_id] = {}
         lst_client_crawl = DB_ACCOUNT.find({"category_id": cate_id})
         list_client = []
         for sess in lst_client_crawl:
             session_phone = sess["phone"]
-            cl = TelegramClient(session_phone, API_ID, API_HASH)
-            await cl.connect()
+            cl = CLIENTS.get(session_phone)
+            if cl is None:
+                cl = TelegramClient(session_phone, API_ID, API_HASH)
+            try:
+                await cl.connect()
+            except:
+                pass
             if await cl.is_user_authorized():
                 list_client.append(cl)
+                CLIENTS[session_phone] = cl
             else:
                 query = { "phone":  session_phone}
                 new_values = { "$set": { "status": 0 } }
                 status = DB_ACCOUNT.update_many(query, new_values)
 
-        CATEGORY_CRAWL[cate_id]["clients"] = list_client
+        CATEGORY_CRAWL_TEMP[cate_id]["clients"] = list_client
 
         craw_query = {}
         if cate_id!=ALL_CATEGORIES:
@@ -148,34 +159,42 @@ async def initial_crawl():
                 "post_to_category": lst_post_to_category,
                 "replaces": lst_replace_word
             })
-        CATEGORY_CRAWL[cate_id]["from_chats"] = lst_dict_crawl
-    print("initial_crawl")
+        CATEGORY_CRAWL_TEMP[cate_id]["from_chats"] = lst_dict_crawl
+    print("initial crawl done")
+    categories_keys = list(CATEGORY_CRAWL_TEMP.keys()).copy()
+    for k in categories_keys:
+        CATEGORY_CRAWL[k] = {
+            "clients": CATEGORY_CRAWL_TEMP[k]["clients"].copy(),
+            "from_chats": deepcopy(CATEGORY_CRAWL_TEMP[k].get("from_chats"))
+        }
     await asyncio.sleep(0.1)
 
-async def initial_post():
-    global CATEGORY_CRAWL
-    global CATEGORY_POST
-
-    print("initial_post")
+    CATEGORY_POST_TEMP = {}
+    print("initial post")
     categories_post = DB_CATEGORIES.find({"type_id": str(POSTER)})
     for category in list(categories_post):
         cate_id = category.get("id")
-        CATEGORY_POST[cate_id] = {}
+        CATEGORY_POST_TEMP[cate_id] = {}
         lst_client_crawl = DB_ACCOUNT.find({"category_id": cate_id})
         list_client = []
         for sess in lst_client_crawl:
             session_phone = sess["phone"]
-            
-            cl = TelegramClient(session_phone, API_ID, API_HASH)
-            await cl.connect()
+            cl = CLIENTS.get(session_phone)
+            if cl is None:
+                cl = TelegramClient(session_phone, API_ID, API_HASH)
+            try:
+                await cl.connect()
+            except:
+                pass
             if await cl.is_user_authorized():
                 print(session_phone)
                 list_client.append(cl)
+                CLIENTS[session_phone] = cl
             else:
                 query = { "phone":  session_phone}
                 new_values = { "$set": { "status": 0 } }
                 status = DB_ACCOUNT.update_many(query, new_values)
-        CATEGORY_POST[cate_id]["clients"] = list_client
+        CATEGORY_POST_TEMP[cate_id]["clients"] = list_client
         post_to_query = {}
         if cate_id!=ALL_CATEGORIES:
             post_to_query = {"category_id": cate_id}
@@ -188,14 +207,27 @@ async def initial_post():
             if post_to not in lst_post_to:
                 lst_post_to.append(post_to)
         
-        CATEGORY_POST[cate_id]["post_to"] = lst_post_to
+        CATEGORY_POST_TEMP[cate_id]["post_to"] = lst_post_to
+    categories_keys = list(CATEGORY_POST_TEMP.keys()).copy()
+    print("initial post done")
+    for k in categories_keys:
+        CATEGORY_POST[k] = {
+            "clients": CATEGORY_POST_TEMP[k]["clients"].copy(),
+            "post_to": deepcopy(CATEGORY_POST_TEMP[k].get("post_to"))
+        }
     await asyncio.sleep(0.1)
+    
 
 async def Sender():
     global CATEGORY_CRAWL
     global CATEGORY_POST
-
+    global INIT
+    global SENDING
     while 1:
+        if not INIT:
+            await asyncio.sleep(1.5)
+            continue
+        SENDING = True
         categories_keys = list(CATEGORY_POST.keys()).copy()
         categories_cp = {}
         try:
@@ -236,17 +268,29 @@ async def Sender():
                     print(f'{fwe}')
                     asyncio.sleep(delay=fwe.seconds)
                 except Exception as err:
-                    
+                    print(err)
                     logging.exception(err)
                     error_occured = True
                     break
-        await asyncio.sleep(0.01)
-            
+        SENDING = False
+    await asyncio.sleep(0.1)
+
 async def Crawl():
     global CATEGORY_CRAWL
     global CATEGORY_POST
-
+    global INIT
+    global SENDING
+    global CLIENTS
     while True:
+        if not INIT and not SENDING:
+            for k in CLIENTS.keys():
+                try:
+                    await CLIENTS[k].disconnect()
+                except:
+                    print("disconnect")
+            await initial()
+            INIT = True
+
         categories_keys = list(CATEGORY_CRAWL.keys()).copy()
         categories_cp = {}
         for k in categories_keys:
@@ -280,7 +324,7 @@ async def Crawl():
                     offset = 0
                 last_id = 0
                 try:
-                    async for message in client.iter_messages(intify("https://t.me/CoinMarketCap"), reverse=True, offset_id=offset):
+                    async for message in client.iter_messages(intify(from_chat), reverse=True, offset_id=offset):
                         # offset = str(message.id)
                         
                         dict_from_chat["offset"] = message.id
@@ -305,17 +349,26 @@ async def Crawl():
                         except Exception as e:
                             print("asdada: ", e)
                         await asyncio.sleep(1.5)
-
+                        if not INIT:
+                            break
+                    await asyncio.sleep(1)
+                    if not INIT:
+                        break
                     print("a")
                 except Exception as e:
                     print(e)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
 def run_init():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    loop.run_until_complete(initial_crawl())
-    loop.run_until_complete(initial_post())
-
+    try:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(initial())
+        # loop.run_until_complete(initial_post())
+    except Exception as e:
+        loop = asyncio.get_event_loop()
+        loop.create_task(initial())
+        # loop.create_task(initial_post())
+        
 # tele = TeleProcess()
 
 # loop.run_forever()

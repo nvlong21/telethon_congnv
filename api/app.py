@@ -10,7 +10,8 @@ from telethon.errors.rpcerrorlist import FloodWaitError
 from telethon import TelegramClient, utils
 from mongo import *
 import uuid
-from service import *
+from multiprocessing.dummy import Process, Queue
+import service
 # tele_account = mydb["accounts"] 
 def get_env(name, message):
     if name in os.environ:
@@ -27,12 +28,6 @@ API_ID = "14225107" #os.getenv('api_id')
 API_HASH = "bc6b2686eea4dc38f72181dd8d279dbf" #os.getenv('api_hash')
 SESSION =  "84986626975"#os.getenv('STRING_SESSION')
 
-# Render things nicely (global setting)
-# Message.set_default_parse_mode('html')
-
-client = None
-phone = None
-dict_client = {}
 # Quart app
 app = Quart(__name__)
 app.secret_key = 'CHANGE THIS TO SOMETHING SECRET'
@@ -62,13 +57,12 @@ async def format_message(message):
 # # Connect the client before we start serving with Quart
 @app.before_serving
 async def startup():
-    global dict_client
     for x in DB_ACCOUNT.find({"status": 1}):
         session = x["phone"]
         cl = TelegramClient(session, API_ID, API_HASH)
         await cl.connect()
         if await cl.is_user_authorized():
-            dict_client[session] = cl
+            service.CLIENTS[session] = cl
         else:
             myquery = { "phone":  session}
             newvalues = { "$set": { "status": 0 } }
@@ -78,8 +72,8 @@ async def startup():
 # # After we're done serving (near shutdown), clean up the client
 @app.after_serving
 async def cleanup():
-    for k in dict_client.keys():
-        await dict_client[k].disconnect()
+    for k in service.CLIENTS.keys():
+        await service.CLIENTS[k].disconnect()
 
 
 @app.route('/sessions', methods=['GET', 'POST'])
@@ -95,12 +89,12 @@ async def root():
         phone = process_phone(phone)
         response_object.update({"phone": phone})
         phone_key = phone.replace("+", "")
-        client = dict_client.get(phone_key, None)
+        client = service.CLIENTS.get(phone_key, None)
         try:
             if client is None:
                 client = TelegramClient(phone_key, API_ID, API_HASH)
                 await client.connect()
-                dict_client[phone_key] = client
+                service.CLIENTS[phone_key] = client
                 if await client.is_user_authorized():
                     x = DB_ACCOUNT.find_one({"phone": phone_key})
                     if x is None:
@@ -152,8 +146,8 @@ async def root():
                 response_object.update({"status": 1, "message": "Send code done!"})
                 return jsonify(response_object)
         except Exception as e:
-            if phone_key in dict_client.keys():
-                dict_client.pop(phone_key)
+            if phone_key in service.CLIENTS.keys():
+                service.CLIENTS.pop(phone_key)
                 new_dict = { "$set": {"status": 1}}
                 query = { "phone":  phone_key}
                 x = DB_ACCOUNT.update_many(query, new_dict)
@@ -362,6 +356,12 @@ async def craw_process():
             list_results.append(x)
         return jsonify(list_results)
 
+@app.route('/reload-db', methods=['GET'])
+async def reload_db():
+    service.INIT = False
+    return jsonify({"status": "done"}) 
+
+
 @app.route('/get_category', methods=['GET'])
 async def get_category():
     # data = request.args
@@ -392,10 +392,10 @@ async def main():
 # won't have to worry about any of this, but it's still good to be
 # explicit about the event loop.
 if __name__ == '__main__':
-    run_init()
+    # run_init()
     loop = asyncio.get_event_loop()
-    loop.create_task(Sender())
+    loop.create_task(service.Sender())
     loop.create_task(main())
-    Process(loop.run_until_complete(Crawl())).run()
+    Process(loop.run_until_complete(service.Crawl())).run()
     
     # asyncio.run(main())
