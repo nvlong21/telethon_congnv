@@ -8,7 +8,7 @@
       <el-form ref="form" :model="addKeyWords" label-width="120px">
         <el-form-item label="Category">
           <el-select v-model="addKeyWords.cate_id" placeholder="please select category">
-            <el-option v-for="(cat, idx) in arrayCates" :key="idx" :label="cat.name" :value="cat.value"  />
+            <el-option v-for="(cat, idx) in arrayCates" :key="idx" :label="cat.name" :value="cat.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="Words">
@@ -65,6 +65,7 @@ export default {
       listLoading: false,
       arrayCates: [],
       open: false,
+      base_app_api: process.env.VUE_APP_BASEURL,
       object: {
         name: 'Object Name'
       }
@@ -82,20 +83,20 @@ export default {
           'cate_id': this.addKeyWords.cate_id
         })
       }
-      fetch('http://localhost:8001/keywords', requestOptions).then(async response => {
+      fetch(this.base_app_api + '/keywords', requestOptions).then(async response => {
         this.$router.go(this.$router.currentRoute)
       })
     },
     getKeyWorlds() {
       this.listLoading = true
-      fetch('http://localhost:8001/keywords').then(async response => {
+      fetch(this.base_app_api + '/keywords').then(async response => {
         const datas = await response.json()
         this.keywords = datas
         this.listLoading = false
       })
     },
     getCategory(id) {
-      fetch('http://localhost:8001/categories?type_id=3').then(async response => {
+      fetch(this.base_app_api + '/categories?type_id=3').then(async response => {
         const datas = await response.json()
         for (var i = 0; i < datas.length; i += 1) {
           this.arrayCates.push({ name: datas[i].name, value: datas[i].id })

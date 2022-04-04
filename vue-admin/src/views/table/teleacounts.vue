@@ -1,7 +1,7 @@
 <template>
   <div class="modal-vue">
     <button @click="open = true">Add</button>
-    <div v-if="open" class="overlay" @click="open = false"></div>
+    <div v-if="open" class="overlay" @click="open = false"> </div>
     <div v-if="open" class="modal">
       <button class="close" @click="open = false">x</button>
       <h3>Get code</h3>
@@ -14,7 +14,7 @@
         </el-form-item>
       </el-form>
     </div>
-    <div v-if="open_code" class="overlay" @click="open_code = true"></div>
+    <div v-if="open_code" class="overlay" @click="open_code = true"> </div>
     <div v-if="open_code" class="modal">
       <button class="close" @click="open_code = true">x</button>
       <h3>Verify code</h3>
@@ -27,20 +27,20 @@
         </el-form-item>
       </el-form>
     </div>
-    <div v-if="open_add_task" class="overlay" @click="modalClose"></div>
+    <div v-if="open_add_task" class="overlay" @click="modalClose"> </div>
     <div v-if="open_add_task" class="modal">
       <button class="close" @click="modalClose">x</button>
       <h3>Task</h3>
       <el-form ref="form" :model="telesession" label-width="120px">
         <el-form-item label="Task">
-          <el-select v-model="telesession.task_id" @change="dropDownTaskChange" placeholder="please select task">
+          <el-select v-model="telesession.task_id" placeholder="please select task" @change="dropDownTaskChange">
             <el-option label="Crawler" value="1" />
             <el-option label="Poster" value="2" />
           </el-select>
         </el-form-item>
         <el-form-item label="Category">
           <el-select v-model="telesession.category_id" placeholder="please select category">
-            <el-option v-for="(cat, idx) in arrayCates" :key="idx" :label="cat.name" :value="cat.value"  />
+            <el-option v-for="(cat, idx) in arrayCates" :key="idx" :label="cat.name" :value="cat.value" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -109,6 +109,7 @@ export default {
         category_id: null
       },
       open: false,
+      base_app_api: process.env.VUE_APP_BASEURL,
       open_code: false,
       open_add_task: false,
       arrayCates: []
@@ -129,7 +130,7 @@ export default {
           'category_id': this.telesession.category_id
         })
       }
-      fetch('http://localhost:8001/sessions', requestOptions).then(async response => {
+      fetch(this.base_app_api + '/sessions', requestOptions).then(async response => {
         // this.$router.go(this.$router.currentRoute)
         const data = await response.json()
         if (data.status === 1) {
@@ -149,8 +150,7 @@ export default {
               this.$router.go(this.$router.currentRoute)
             }
           }
-        }
-        else if (data.status === 2) {
+        } else if (data.status === 2) {
           this.open = false
           this.open_code = false
           this.open_add_task = true
@@ -159,14 +159,14 @@ export default {
     },
     fetchData() {
       this.listLoading = true
-      fetch('http://localhost:8001/sessions').then(async response => {
+      fetch(this.base_app_api + '/sessions').then(async response => {
         const datas = await response.json()
         this.list = datas
         this.listLoading = false
       })
     },
     getCategory(id) {
-      fetch('http://localhost:8001/categories?type_id='+ id).then(async response => {
+      fetch(this.base_app_api + '/categories?type_id=' + id).then(async response => {
         const datas = await response.json()
         console.log(datas)
         for (var i = 0; i < datas.length; i += 1) {

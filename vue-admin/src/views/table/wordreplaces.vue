@@ -8,11 +8,11 @@
       <el-form ref="form" :model="addReplaceWords" label-width="120px">
         <el-form-item label="Category">
           <el-select v-model="addReplaceWords.cate_id" placeholder="please select category">
-            <el-option v-for="(cat, idx) in arrayCates" :key="idx" :label="cat.name" :value="cat.value"  />
+            <el-option v-for="(cat, idx) in arrayCates" :key="idx" :label="cat.name" :value="cat.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="Word">
-          <el-input v-model="addReplaceWords.list_keyword" type="textarea"/>
+          <el-input v-model="addReplaceWords.list_keyword" type="textarea" />
         </el-form-item>
         <el-form-item label="Replace">
           <el-input v-model="addReplaceWords.replace" type="textarea" />
@@ -36,7 +36,7 @@
             {{ scope.$index }}
           </template>
         </el-table-column>
-        <el-table-column label="Keyword"  align="center">
+        <el-table-column label="Keyword" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.word }}</span>
           </template>
@@ -74,12 +74,11 @@ export default {
       listLoading: false,
       arrayCates: [],
       open: false,
+      base_app_api: process.env.VUE_APP_BASEURL,
       object: {
         name: 'Object Name'
       }
     }
-  },
-  components: {
   },
   methods: {
     addCate() {
@@ -92,20 +91,20 @@ export default {
           'cate_id': this.addReplaceWords.cate_id
         })
       }
-      fetch('http://localhost:8001/replace-words', requestOptions).then(async response => {
+      fetch(this.base_app_api + '/replace-words', requestOptions).then(async response => {
         this.$router.go(this.$router.currentRoute)
       })
     },
     getReplaceWorlds() {
       this.listLoading = true
-      fetch('http://localhost:8001/replace-words').then(async response => {
+      fetch(this.base_app_api + '/replace-words').then(async response => {
         const datas = await response.json()
         this.replacewords = datas
         this.listLoading = false
       })
     },
     getCategory(id) {
-      fetch('http://localhost:8001/categories?type_id=4').then(async response => {
+      fetch(this.base_app_api + '/categories?type_id=4').then(async response => {
         const datas = await response.json()
         for (var i = 0; i < datas.length; i += 1) {
           this.arrayCates.push({ name: datas[i].name, value: datas[i].id })

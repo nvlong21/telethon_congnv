@@ -79,6 +79,7 @@ export default {
       listLoading: false,
       arrayCates: [],
       open: false,
+      base_app_api: process.env.VUE_APP_BASEURL,
       object: {
         name: 'Object Name'
       }
@@ -97,20 +98,20 @@ export default {
           'cate_id': this.addReplaceWords.cate_id
         })
       }
-      fetch('http://localhost:8001/replace-words', requestOptions).then(async response => {
+      fetch(this.base_app_api + '/replace-words', requestOptions).then(async response => {
         this.$router.go(this.$router.currentRoute)
       })
     },
     getReplaceWorlds() {
       this.listLoading = true
-      fetch('http://localhost:8001/replace-words').then(async response => {
+      fetch(this.base_app_api + '/replace-words').then(async response => {
         const datas = await response.json()
         this.replacewords = datas
         this.listLoading = false
       })
     },
     getCategory(id) {
-      fetch('http://localhost:8001/categories?cate_for=filter&type_id=4').then(async response => {
+      fetch(this.base_app_api + '/categories?cate_for=filter&type_id=4').then(async response => {
         const datas = await response.json()
         for (var i = 0; i < datas.length; i += 1) {
           this.arrayCates.push({ name: datas[i].name, value: datas[i].id })

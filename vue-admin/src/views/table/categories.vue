@@ -76,6 +76,7 @@ export default {
         name: null,
         task_id: 0
       },
+      base_app_api: process.env.VUE_APP_BASEURL,
       open: false
     }
   },
@@ -92,14 +93,14 @@ export default {
           'type_id': this.category.task_id
         })
       }
-      fetch('http://localhost:8001/categories', requestOptions).then(async response => {
+      fetch(this.base_app_api + '/categories', requestOptions).then(async response => {
         this.$router.go(this.$router.currentRoute)
         console.log(response)
       })
     },
     fetchData() {
       this.listLoading = true
-      fetch('http://localhost:8001/categories').then(async response => {
+      fetch(this.base_app_api + '/categories').then(async response => {
         const datas = await response.json()
         this.list = datas
         this.listLoading = false

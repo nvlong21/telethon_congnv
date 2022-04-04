@@ -7,34 +7,33 @@
       <h3>Title</h3>
       <el-form ref="form" :model="addCrawlProcess" label-width="120px">
         <el-form-item label="Crawl From">
-          <el-input v-model="addCrawlProcess.list_from" type="textarea"/>
+          <el-input v-model="addCrawlProcess.list_from" type="textarea" />
         </el-form-item>
         <el-form-item label="Type">
           <el-select v-model="addCrawlProcess.type" placeholder="please select category">
-            <el-option label="User" value="1"  />
-            <el-option label="Chanel" value="2"  />
-            <el-option label="Group" value="3"  />
+            <el-option label="User" value="1" />
+            <el-option label="Chanel" value="2" />
+            <el-option label="Group" value="3" />
           </el-select>
-        </el-form-item>
         </el-form-item>
         <el-form-item label="Category Crawl">
           <el-select v-model="addCrawlProcess.category_crawl" placeholder="please select category">
-            <el-option v-for="(cat, idx) in arrayCatesCrawl" :key="idx" :label="cat.name" :value="cat.value"  />
+            <el-option v-for="(cat, idx) in arrayCatesCrawl" :key="idx" :label="cat.name" :value="cat.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="Post To">
           <el-select v-model="addCrawlProcess.category_post" placeholder="please select category">
-            <el-option v-for="(cat, idx) in arrayCatesPost" :key="idx" :label="cat.name" :value="cat.value"  />
+            <el-option v-for="(cat, idx) in arrayCatesPost" :key="idx" :label="cat.name" :value="cat.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="Filter Word">
           <el-select v-model="addCrawlProcess.category_word" placeholder="please select category">
-            <el-option v-for="(cat, idx) in arrayCatesFilterWord" :key="idx" :label="cat.name" :value="cat.value"  />
+            <el-option v-for="(cat, idx) in arrayCatesFilterWord" :key="idx" :label="cat.name" :value="cat.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="Replace Word">
           <el-select v-model="addCrawlProcess.category_replace_word" placeholder="please select category">
-            <el-option v-for="(cat, idx) in arrayCatesReplaceWord" :key="idx" :label="cat.name" :value="cat.value"  />
+            <el-option v-for="(cat, idx) in arrayCatesReplaceWord" :key="idx" :label="cat.name" :value="cat.value" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -66,22 +65,22 @@
             <span>{{ scope.row.type }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Category Crawl"  align="center">
+        <el-table-column label="Category Crawl" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.category_crawl }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Category Post"  align="center">
+        <el-table-column label="Category Post" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.category_post }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Category Words"  align="center">
+        <el-table-column label="Category Words" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.category_word }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Category Replace Word"  align="center">
+        <el-table-column label="Category Replace Word" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.category_replace_word }}</span>
           </template>
@@ -115,12 +114,11 @@ export default {
       arrayCatesCrawl: [],
       arrayCatesFilterWord: [],
       open: false,
+      base_app_api: process.env.VUE_APP_BASEURL,
       object: {
         name: 'Object Name'
       }
     }
-  },
-  components: {
   },
   methods: {
     addCate() {
@@ -136,8 +134,8 @@ export default {
           'category_replace_id': this.addCrawlProcess.category_replace_word
         })
       }
-      fetch('http://localhost:8001/craw-process', requestOptions).then(async response => {
-        fetch('http://localhost:8001/reload-db').then(async response => {
+      fetch(this.base_app_api + '/craw-process', requestOptions).then(async response => {
+        fetch(this.base_app_api + '/reload-db').then(async response => {
           const datas = await response.json()
           console.log(datas)
         })
@@ -146,7 +144,7 @@ export default {
     },
     getReplaceWorlds() {
       this.listLoading = true
-      fetch('http://localhost:8001/craw-process').then(async response => {
+      fetch(this.base_app_api + '/craw-process').then(async response => {
         const datas = await response.json()
         this.crawlProcess = datas
         this.listLoading = false
@@ -160,21 +158,21 @@ export default {
         }
         console.log(this.arrayCatesCrawl)
       })
-      fetch('http://localhost:8001/categories?type_id=2').then(async response => {
+      fetch(this.base_app_api + '/categories?type_id=2').then(async response => {
         const datas = await response.json()
         for (var i = 0; i < datas.length; i += 1) {
           this.arrayCatesPost.push({ name: datas[i].name, value: datas[i].id })
         }
         console.log(this.arrayCatesPost)
       })
-            fetch('http://localhost:8001/categories?type_id=3').then(async response => {
+      fetch(this.base_app_api + '/categories?type_id=3').then(async response => {
         const datas = await response.json()
         for (var i = 0; i < datas.length; i += 1) {
           this.arrayCatesFilterWord.push({ name: datas[i].name, value: datas[i].id })
         }
         console.log(this.arrayCatesFilterWord)
       })
-      fetch('http://localhost:8001/categories?type_id=4').then(async response => {
+      fetch(this.base_app_api + '/categories?type_id=4').then(async response => {
         const datas = await response.json()
         for (var i = 0; i < datas.length; i += 1) {
           this.arrayCatesReplaceWord.push({ name: datas[i].name, value: datas[i].id })
@@ -191,7 +189,7 @@ export default {
       this.arrayCatesCrawl = []
       this.arrayCatesPost = []
       this.arrayCatesFilterWord = []
-       this.arrayCatesReplaceWord = []
+      this.arrayCatesReplaceWord = []
     },
     methodToRunOnSelect(payload) {
       this.addReplaceWords.cate_id = payload.value
