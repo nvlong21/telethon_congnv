@@ -233,7 +233,6 @@ async def Sender():
         try:
             message = QUEUE_MESS.get_nowait()
         except Exception as e:
-            print("ex: ", e)
             await asyncio.sleep(1.3)
             continue
         # for k in categories_keys:

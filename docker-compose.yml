@@ -23,7 +23,6 @@ services:
   client:
     build: vue-admin
     ports:
-    - "8080:8080"
     - "8002:8002"
     - "8003:8003"
     links:

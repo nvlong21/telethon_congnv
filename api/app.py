@@ -75,6 +75,11 @@ async def cleanup():
     for k in service.CLIENTS.keys():
         await service.CLIENTS[k].disconnect()
 
+@app.route('/session/<id>', methods=['DELETE'])
+async def delete_session(id):
+    query = {"id": str(id)}
+    DB_ACCOUNT.delete_many(query)
+    return jsonify({"message": "success", "status": 1})
 
 @app.route('/sessions', methods=['GET', 'POST'])
 async def root():
@@ -152,7 +157,7 @@ async def root():
                 query = { "phone":  phone_key}
                 x = DB_ACCOUNT.update_many(query, new_dict)
             return jsonify({"message": str(e), "status": 0})
-    else:
+    elif request.method == 'GET':
         try:
             list_session = []
             response_object = {'status': 1}
@@ -172,6 +177,7 @@ async def root():
             return jsonify(list_session)
         except:
             return jsonify({"message": "error", "status": 0})
+
 
 # @app.route('/verify-code', methods=['GET', 'POST'])
 # async def verifycode():
@@ -211,6 +217,13 @@ async def init_exam():
 async def taks():
     return jsonify({"id": 1, "name": "Crawl"}, {"id": 2, "name": "Poster"})
 
+@app.route('/categorie/<id>', methods=['DELETE'])
+async def delete_categorie(id):
+    query = {"id": str(id)}
+    d = DB_CATEGORIES.delete_many(query)
+    return jsonify({"message": "success", "status": 1})
+
+
 @app.route('/categories', methods=['GET', 'POST'])
 async def categories():
     response_object = {'status': 0}
@@ -228,6 +241,8 @@ async def categories():
         type_id = data.get("type_id")
         query = {}
         if type_id is not None:
+            if int(type_id)<=2:
+                list_cate_results.append({"id": ALL_CATEGORIES, "type": '#', "name": "All"})
             query.update({"type_id": type_id})
         cate_for = data.get("cate_for")
         if cate_for is not None:
@@ -244,6 +259,13 @@ async def categories():
                 x.pop("_id")
                 list_cate_results.append(x)
         return jsonify(list_cate_results)
+
+@app.route('/keyword/<id>', methods=['DELETE'])
+async def delete_keyword(id):
+    query = {"id": str(id)}
+    d = DB_KEYWORD.delete_many(query)
+    return jsonify({"message": "success", "status": 1})
+
 
 @app.route('/keywords', methods=['GET', 'POST'])
 async def keyword():
@@ -277,6 +299,14 @@ async def keyword():
         return jsonify(list_results)
 
 
+@app.route('/replace-word/<id>', methods=['DELETE'])
+async def delete_replace_word(id):
+    query = {"id": str(id)}
+    d = DB_REPLACE_WORD.delete_many(query)
+    return jsonify({"message": "success", "status": 1})
+   
+
+
 @app.route('/replace-words', methods=['GET', 'POST'])
 async def replace_words():
     response_object = {'status': 0}
@@ -307,6 +337,14 @@ async def replace_words():
                 list_results.append(x)
         return jsonify(list_results)
 
+@app.route('/craw-process/<id>', methods=['DELETE'])
+async def delete_craw_process(id):
+    query = {"id": str(id)}
+    d = DB_CRAWL.delete_many(query)
+    return jsonify({"message": "success", "status": 1})
+    
+
+
 @app.route('/craw-process', methods=['GET', 'POST'])
 async def craw_process():
     response_object = {'status': 0}
@@ -334,6 +372,7 @@ async def craw_process():
             list_crawl_process = list(DB_CRAWL.find({}))
         category_name = ""
         list_results = []
+
         for x in list_crawl_process:
             x.pop("_id")
             category = DB_CATEGORIES.find_one({"id": x["category_id"]})
@@ -368,11 +407,11 @@ async def reload_db():
     return jsonify({"status": "done"}) 
 
 
-@app.route('/get_category', methods=['GET'])
-async def get_category():
-    # data = request.args
-    # print(data.get("id"))
-    return jsonify([{"id": 1, "name":"share keo"}, {"id": 2, "name":"ca do"}]) 
+# @app.route('/get_category', methods=['GET'])
+# async def get_category():
+#     # data = request.args
+#     # print(data.get("id"))
+#     return jsonify([{"id": 1, "name":"share keo"}, {"id": 2, "name":"ca do"}]) 
 
 
 async def main():

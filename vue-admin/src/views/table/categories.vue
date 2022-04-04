@@ -1,6 +1,6 @@
 <template>
+
   <div class="modal-vue">
-    <button @click="open = true">Add</button>
     <div v-if="open" class="overlay" @click="open = false"></div>
     <div v-if="open" class="modal">
       <button class="close" @click="open = false">x</button>
@@ -22,7 +22,9 @@
         </el-form-item>
       </el-form>
     </div>
+    
     <div class="app-container">
+      <el-button type="primary" @click="open = true">Add</el-button>
       <el-table
         v-loading="listLoading"
         :data="list"
@@ -47,8 +49,8 @@
           </template>
         </el-table-column>
         <el-table-column label="Setting" width="110" align="center">
-          <template>
-            <span>Setting</span>
+          <template slot-scope="scope">
+            <el-button style="padding: 2px 5px;" type="danger" @click="deleteByID(scope.row.id)">Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -96,6 +98,12 @@ export default {
       fetch(this.base_app_api + '/categories', requestOptions).then(async response => {
         this.$router.go(this.$router.currentRoute)
         console.log(response)
+      })
+    },
+    deleteByID(id) {
+      fetch(this.base_app_api + '/categorie/' + id, { method: 'DELETE' }).then(async response => {
+        console.log(response)
+        this.$router.go(this.$router.currentRoute)
       })
     },
     fetchData() {

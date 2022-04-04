@@ -28,7 +28,7 @@ def drop_all():
     DB_TASK.drop()
     DB_POST.drop()
     
-# drop_all()
+drop_all()
 def test_db():
     mydict = { "id": str(uuid.uuid4().hex), "phone": "84925905936", "task_id": str(CRAWL), "category_id": "coin", "status": 1}
     DB_ACCOUNT.insert_one(mydict)

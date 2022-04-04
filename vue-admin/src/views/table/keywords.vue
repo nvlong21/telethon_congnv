@@ -1,6 +1,5 @@
 <template>
   <div class="modal-vue">
-    <button @click="modalShow">Add</button>
     <div v-if="open" class="overlay" @click="modelClose"></div>
     <div v-if="open" class="modal">
       <button class="close" @click="open = false">x</button>
@@ -20,6 +19,7 @@
       </el-form>
     </div>
     <div class="app-container">
+      <el-button type="primary" @click="modalShow">Add</el-button>
       <el-table
         v-loading="listLoading"
         :data="keywords"
@@ -44,8 +44,8 @@
           </template>
         </el-table-column>
         <el-table-column label="Setting" width="110" align="center">
-          <template>
-            <span>Setting</span>
+          <template slot-scope="scope">
+            <el-button style="padding: 2px 5px;" type="danger" @click="deleteByID(scope.row.id)">Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -102,6 +102,12 @@ export default {
           this.arrayCates.push({ name: datas[i].name, value: datas[i].id })
           console.log(datas[i].id)
         }
+      })
+    },
+    deleteByID(id) {
+      fetch(this.base_app_api + '/keyword/' + id, { method: 'DELETE' }).then(async response => {
+        console.log(response)
+        this.$router.go(this.$router.currentRoute)
       })
     },
     modalShow() {
