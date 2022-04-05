@@ -334,7 +334,7 @@ async def Crawl():
                         content = process_message(message, filters, replaces)
                         if content =="":
                             continue
-                        message.text = content
+                        message.text = "[{}] ".format(intify(from_chat)) + content
                         try:
                             QUEUE_MESS.put_nowait(
                                 {
