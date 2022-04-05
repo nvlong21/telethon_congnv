@@ -58,7 +58,7 @@ def test_db():
 
     mydict = { "id": str(uuid.uuid4().hex), "from": "https://t.me/CoinMarketCap", "type": "chanel", "category_id": "coin",
                 "category_keyword_id": "52d8151df4f344bba4b5c56974213dac", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
-                "category_replace_id": "52d8151df4f344bba4b5c56974213dar", "offset": 0}
+                "category_replace_id": "52d8151df4f344bba4b5c56974213dar", "offset": 3300000}
     DB_CRAWL.insert_one(mydict)
     mydict = { "id": str(uuid.uuid4().hex), "from": "https://t.me/CoinDCX_Go_Announcements", "type": "chanel", "category_id": "coin",
                 "category_keyword_id": "52d8151df4f344bba4b5c56974213dac", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
