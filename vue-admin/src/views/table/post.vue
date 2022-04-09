@@ -54,10 +54,9 @@
         </el-table-column>
         <el-table-column label="Category Post" align="center">
           <template slot-scope="scope">
-            <router-link :to="{ name: 'Category', params: { cate_id:  scope.row.category_post_id}}" ><span>{{ scope.row.category_post }}</span></router-link>
+            <router-link :to="{ name: 'Category', params: { cate_id:  scope.row.category_post_id }}" ><span>{{ scope.row.category_post }}</span></router-link>
           </template>
         </el-table-column>
-        
         <el-table-column label="Setting" width="110" align="center">
           <template slot-scope="scope">
             <el-button style="padding: 2px 5px;" type="danger" @click="deleteByID(scope.row.id)">Delete</el-button>
@@ -158,7 +157,6 @@ export default {
     },
     deleteByID(id) {
       fetch(this.base_app_api + '/post-process/' + id, { method: 'DELETE' }).then(async response => {
-        
         this.$router.go(this.$router.currentRoute)
       })
     },

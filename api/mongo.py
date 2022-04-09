@@ -17,7 +17,7 @@ ALL_CATEGORIES = "52d8151df4f344bba4b5c56974213dbd"
 DB_ACCOUNT = DB_FORWARD_CHAT["accounts"]
 DB_CATEGORIES = DB_FORWARD_CHAT["categories"]
 DB_KEYWORD = DB_FORWARD_CHAT["keywords"]
-DB_REMOVEWORD = DB_FORWARD_CHAT["remove_words"]
+DB_STOPWORD = DB_FORWARD_CHAT["stop_words"]
 DB_REPLACE_WORD = DB_FORWARD_CHAT["replace_words"]
 DB_CRAWL = DB_FORWARD_CHAT["crawls"]
 DB_POST = DB_FORWARD_CHAT["posts"]
@@ -30,6 +30,7 @@ def drop_all():
     DB_CRAWL.drop()
     DB_TASK.drop()
     DB_POST.drop()
+    DB_STOPWORD.drop()
     
 drop_all()
 def test_db():
@@ -60,37 +61,35 @@ def test_db():
 
 
     mydict = { "id": str(uuid.uuid4().hex), "from": "https://t.me/CoinMarketCap", "type": "chanel", "category_id": "coin",
-                "category_keyword_id": "52d8151df4f344bba4b5c56974213dac", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
+                "category_keyword_id": "52d8151df4f344bba4b5c56974213dac", "category_stopword_id" : "52d8151df4f344bba4b5c5697421", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
                 "category_replace_id": "52d8151df4f344bba4b5c56974213dar", "offset": 3300000}
     DB_CRAWL.insert_one(mydict)
     mydict = { "id": str(uuid.uuid4().hex), "from": "https://t.me/CoinDCX_Go_Announcements", "type": "chanel", "category_id": "coin",
-                "category_keyword_id": "52d8151df4f344bba4b5c56974213dac", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
+                "category_keyword_id": "52d8151df4f344bba4b5c56974213dac", "category_stopword_id" : "52d8151df4f344bba4b5c5697421", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
                 "category_replace_id": "52d8151df4f344bba4b5c56974213dar", "offset": 0}
     DB_CRAWL.insert_one(mydict)
 
     mydict = { "id": str(uuid.uuid4().hex), "from": "https://t.me/coindcx", "type": "chanel", "category_id": "coin",
-                "category_keyword_id": "52d8151df4f344bba4b5c56974213dac", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
+                "category_keyword_id": "52d8151df4f344bba4b5c56974213dac", "category_stopword_id" : "52d8151df4f344bba4b5c5697421", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
                 "category_replace_id": "52d8151df4f344bba4b5c56974213dar", "offset": 0}
     DB_CRAWL.insert_one(mydict)
 
     mydict = { "id": str(uuid.uuid4().hex), "from": "https://t.me/CoinX", "type": "chanel", "category_id": "coin",
-                "category_keyword_id": "52d8151df4f344bba4b5c56974213dac", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
+                "category_keyword_id": "52d8151df4f344bba4b5c56974213dac", "category_stopword_id" : "52d8151df4f344bba4b5c5697421", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
                 "category_replace_id": "52d8151df4f344bba4b5c56974213dar", "offset": 0}
     DB_CRAWL.insert_one(mydict)
-
-
 
 
     mydict = { "id": str(uuid.uuid4().hex), "from": "https://t.me/FTX_Official", "type": "chanel", "category_id": "trade",
-                "category_keyword_id": "52d8151df4f344bba4b5c56974213d", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
+                "category_keyword_id": "52d8151df4f344bba4b5c56974213d", "category_stopword_id" : "52d8151df4f344bba4b5c5697421","category_post_id": "52d8151df4f344bba4b5c56974213dap",
                 "category_replace_id": "52d8151df4f344bba4b5c56974213dar", "offset": 0}
     DB_CRAWL.insert_one(mydict)
     mydict = { "id": str(uuid.uuid4().hex), "from": "https://t.me/teleportstrader", "type": "chanel", "category_id": "trade",
-                "category_keyword_id": "52d8151df4f344bba4b5c56974213d", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
+                "category_keyword_id": "52d8151df4f344bba4b5c56974213d", "category_stopword_id" : "52d8151df4f344bba4b5c5697421","category_post_id": "52d8151df4f344bba4b5c56974213dap",
                 "category_replace_id": "52d8151df4f344bba4b5c56974213dar", "offset": 0}
     DB_CRAWL.insert_one(mydict)
     mydict = { "id": str(uuid.uuid4().hex), "from": "https://t.me/trade", "type": "chanel", "category_id": "trade",
-                "category_keyword_id": "52d8151df4f344bba4b5c56974213d", "category_post_id": "52d8151df4f344bba4b5c56974213dap",
+                "category_keyword_id": "52d8151df4f344bba4b5c56974213d", "category_stopword_id" : "52d8151df4f344bba4b5c5697421","category_post_id": "52d8151df4f344bba4b5c56974213dap",
                 "category_replace_id": "52d8151df4f344bba4b5c56974213dar", "offset": 0}
     DB_CRAWL.insert_one(mydict)
 
@@ -107,6 +106,8 @@ def test_db():
     DB_CATEGORIES.insert_one(mydict)
     mydict = { "id": "52d8151df4f344bba4b5c56974213dar", "name": "Replace", "type_id": "4"}
     DB_CATEGORIES.insert_one(mydict)
+    mydict = { "id": "52d8151df4f344bba4b5c5697421", "name": "Stop word for trade", "type_id": "5"}
+    DB_CATEGORIES.insert_one(mydict)
 
     mydict = { "id": str(uuid.uuid4().hex), "keyword": "coin", "category_id": "52d8151df4f344bba4b5c56974213dac"}
     DB_KEYWORD.insert_one(mydict)
@@ -122,6 +123,12 @@ def test_db():
 
     mydict = { "id": str(uuid.uuid4().hex), "keyword": "trade", "category_id": "52d8151df4f344bba4b5c56974213d"}
     DB_KEYWORD.insert_one(mydict)
+
+    mydict = { "id": str(uuid.uuid4().hex), "stop_word": "123", "category_id": "52d8151df4f344bba4b5c5697421"}
+    DB_STOPWORD.insert_one(mydict)
+
+    mydict = { "id": str(uuid.uuid4().hex), "stop_word": "456", "category_id": "52d8151df4f344bba4b5c5697421"}
+    DB_STOPWORD.insert_one(mydict)
 
 
 

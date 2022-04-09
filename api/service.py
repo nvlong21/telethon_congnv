@@ -30,7 +30,7 @@ def intify(string):
     except:
         return string
 
-def process_message(message, filters, replaces):
+def process_message(message, filters, stop_words, replaces):
     # if message.photo:
     #     content = '<img src="data:image/png;base64,{}" alt="{}" />'.format(
     #         base64.b64encode(await message.download_media(bytes)).decode(),
@@ -43,6 +43,11 @@ def process_message(message, filters, replaces):
     for str_filter in filters:
         if str_filter.lower() in content.lower():
             filter_flag = True
+            break
+            
+    for stop_word in stop_words:
+        if stop_word.lower() in content.lower():
+            filter_flag = False
             break
 
     if filter_flag:
@@ -114,6 +119,7 @@ async def initial():
             from_chat = crawl.get("from")
             type_from = crawl.get("type")
             category_filter_id = crawl.get("category_keyword_id")
+            category_stopwords_id = crawl.get("category_stopword_id")
             category_post_id = crawl.get("category_post_id")
             category_replace_id = crawl.get("category_replace_id")
             offset = crawl.get("offset")
@@ -125,6 +131,16 @@ async def initial():
             for filter_entri in lst_filter_entri:
                 str_filter = filter_entri.get("keyword")
                 lst_filter.append(str_filter)
+
+            lst_stopwords = []
+            stopword_query = {}
+            if category_filter_id!=ALL_CATEGORIES:
+                stopword_query.update({"category_id": category_filter_id})
+            lst_stopwords_entri = DB_KEYWORD.find(stopword_query)
+            for stopword_entri in lst_stopwords_entri:
+                str_filter = stopword_entri.get("stop_word")
+                lst_stopwords.append(str_filter)
+
 
             lst_post_to_category = []
             lst_post_to_category.append(category_post_id)
@@ -156,6 +172,7 @@ async def initial():
                 "type": type_from,
                 "offset": offset,
                 "filters": lst_filter,
+                "stop_words": lst_stopwords,
                 "post_to_category": lst_post_to_category,
                 "replaces": lst_replace_word
             })
@@ -317,6 +334,7 @@ async def Crawl():
                 from_chat = dict_from_chat.get("from_chat")
                 offset = int(dict_from_chat.get("offset"))
                 filters = dict_from_chat.get("filters")
+                stop_words = dict_from_chat.get("stop_words")
                 lst_post_to_category = dict_from_chat.get("post_to_category")
                 replaces = dict_from_chat.get("replaces")
                 if not offset:

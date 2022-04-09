@@ -305,7 +305,7 @@ async def keyword():
 @app.route('/remove-word/<id>', methods=['DELETE'])
 async def delete_remove_word(id):
     query = {"id": str(id)}
-    d = DB_REMOVEWORD.delete_many(query)
+    d = DB_STOPWORD.delete_many(query)
     return jsonify({"message": "success", "status": 1})
 
 
@@ -318,17 +318,17 @@ async def remove_word():
         cate_id = post_data.get("cate_id")
         if remove_words is not None:
             for remove_word in remove_words:
-                mydict = { "id": str(uuid.uuid4().hex), "remove_word": remove_word, "category_id": cate_id}
-                DB_REMOVEWORD.insert_one(mydict)
+                mydict = { "id": str(uuid.uuid4().hex), "stop_word": remove_word, "category_id": cate_id}
+                DB_STOPWORD.insert_one(mydict)
         response_object = {'status': 1}
         return jsonify(response_object)
     else:
         get_data = request.args.to_dict(flat=True)
         cat_id = get_data.get("cat_id")
         if cat_id is not None:
-            list_remove_word = list(DB_REMOVEWORD.find({"category_id": cat_id}))
+            list_remove_word = list(DB_STOPWORD.find({"category_id": cat_id}))
         else:
-            list_remove_word = list(DB_REMOVEWORD.find({}))
+            list_remove_word = list(DB_STOPWORD.find({}))
         category_name = ""
         list_results = []
         for x in list_remove_word:
@@ -396,11 +396,12 @@ async def crawl_process():
         from_type = post_data.get("type")
         cate_id = post_data.get("category_crawl")
         category_keyword_id = post_data.get("category_keyword_id")
+        category_stopword_id = post_data.get("category_stopword_id")
         category_post_id = post_data.get("category_post_id")
         category_replace_id = post_data.get("category_replace_id")
         for fr in get_froms:
             mydict = { "id": str(uuid.uuid4().hex), "from": fr.replace(" ", ""), "type": from_type, "category_id": cate_id,
-                "category_keyword_id": category_keyword_id, "category_post_id": category_post_id,
+                "category_keyword_id": category_keyword_id, "category_stopword_id": category_stopword_id, "category_post_id": category_post_id,
                 "category_replace_id": category_replace_id, "offset": 0}
             DB_CRAWL.insert_one(mydict)
         response_object = {'status': 1}
@@ -428,6 +429,12 @@ async def crawl_process():
                 category_keyword_name = category_keyword.get("name")
                 x["category_word"] = category_keyword_name
                 x["category_word_id"] = category_keyword.get("id")
+            category_stopword = DB_CATEGORIES.find_one({"id": x["category_stopword_id"]})
+            if category_stopword is not None:
+                category_stopword_name = category_stopword.get("name")
+                x["category_stopword"] = category_stopword_name
+                x["category_stopword_id"] = category_stopword.get("id")
+            
             
             category_post = DB_CATEGORIES.find_one({"id": x["category_post_id"]})
             if category_post is not None:

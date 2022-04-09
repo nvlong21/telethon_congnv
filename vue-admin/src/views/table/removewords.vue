@@ -35,7 +35,7 @@
         </el-table-column>
         <el-table-column label="Stop Word" align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.remove_word }}</span>
+            <span>{{ scope.row.stop_word }}</span>
           </template>
         </el-table-column>
         <el-table-column label="Category" width="150" align="center">

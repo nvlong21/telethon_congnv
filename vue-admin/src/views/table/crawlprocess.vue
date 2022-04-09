@@ -30,6 +30,11 @@
             <el-option v-for="(cat, idx) in arrayCatesFilterWord" :key="idx" :label="cat.name" :value="cat.value" />
           </el-select>
         </el-form-item>
+        <el-form-item label="Stop Word">
+          <el-select v-model="addCrawlProcess.category_stopword" placeholder="please select category">
+            <el-option v-for="(cat, idx) in arrayCatesStopWord" :key="idx" :label="cat.name" :value="cat.value" />
+          </el-select>
+        </el-form-item>
         <el-form-item label="Replace Word">
           <el-select v-model="addCrawlProcess.category_replace_word" placeholder="please select category">
             <el-option v-for="(cat, idx) in arrayCatesReplaceWord" :key="idx" :label="cat.name" :value="cat.value" />
@@ -80,6 +85,11 @@
             <router-link :to="{ name: 'KeyWords', params: { cate_id:  scope.row.category_word_id}}" ><span>{{ scope.row.category_word }}</span></router-link>
           </template>
         </el-table-column>
+        <el-table-column label="Category Stop Words" align="center">
+          <template slot-scope="scope">
+            <router-link :to="{ name: 'RemoveWords', params: { cate_id:  scope.row.category_stopword_id}}" ><span>{{ scope.row.category_stopword }}</span></router-link>
+          </template>
+        </el-table-column>
         <el-table-column label="Category Replace Word" align="center">
           <template slot-scope="scope">
             <router-link :to="{ name: 'ReplaceWords', params: { cate_id:  scope.row.category_replace_word_id}}" ><span>{{ scope.row.category_replace_word }}</span></router-link>
@@ -107,13 +117,15 @@ export default {
         category_crawl: '',
         category_post: '',
         category_word: '',
-        category_replace_word: ''
+        category_replace_word: '',
+        category_stopword:''
       },
       listLoading: false,
       arrayCatesReplaceWord: [],
       arrayCatesPost: [],
       arrayCatesCrawl: [],
       arrayCatesFilterWord: [],
+      arrayCatesStopWord: [],
       open: false,
       base_app_api: process.env.VUE_APP_BASEURL,
       object: {
@@ -181,6 +193,13 @@ export default {
         const datas = await response.json()
         for (var i = 0; i < datas.length; i += 1) {
           this.arrayCatesReplaceWord.push({ name: datas[i].name, value: datas[i].id })
+        }
+        console.log(this.arrayCatesReplaceWord)
+      })
+      fetch(this.base_app_api + '/categories?type_id=5').then(async response => {
+        const datas = await response.json()
+        for (var i = 0; i < datas.length; i += 1) {
+          this.arrayCatesStopWord.push({ name: datas[i].name, value: datas[i].id })
         }
         console.log(this.arrayCatesReplaceWord)
       })
