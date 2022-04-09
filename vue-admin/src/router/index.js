@@ -68,11 +68,30 @@ export const constantRoutes = [
         meta: { title: 'Category', icon: 'table' }
       },
       {
-        path: 'keywords',
-        name: 'Keywords',
-        component: () => import('@/views/table/keywords'),
-        meta: { title: 'Keywords', icon: 'table' }
+        path: 'crawl-process',
+        name: 'CrawlProcess',
+        component: () => import('@/views/table/crawlprocess'),
+        meta: { title: 'Crawl Process', icon: 'table' }
       },
+      {
+        path: 'post-process',
+        name: 'PostProcess',
+        component: () => import('@/views/table/post'),
+        meta: { title: 'Post Process', icon: 'table' }
+      },
+      {
+        path: 'keywords',
+        name: 'KeyWords',
+        component: () => import('@/views/table/keywords'),
+        meta: { title: 'Key Words', icon: 'table' }
+      },
+      {
+        path: 'removewords',
+        name: 'RemoveWords',
+        component: () => import('@/views/table/removewords'),
+        meta: { title: 'Stop Words', icon: 'table' }
+      },
+      
       {
         path: 'replacewords',
         name: 'ReplaceWords',
@@ -84,12 +103,6 @@ export const constantRoutes = [
         name: 'TeleAccount',
         component: () => import('@/views/table/teleacounts'),
         meta: { title: 'Tele Account', icon: 'table' }
-      },
-      {
-        path: 'crawl-process',
-        name: 'CrawlProcess',
-        component: () => import('@/views/table/crawlprocess'),
-        meta: { title: 'Crawl Process', icon: 'table' }
       }
     ]
   },

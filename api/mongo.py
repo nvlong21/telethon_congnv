@@ -6,6 +6,8 @@ CRAWL = 1
 POSTER = 2
 KEY_WORDS = 3
 REPLACE_WORDS = 4
+STOP_WORDS = 5
+
 
 
 COLLECTION = pymongo.MongoClient(MONGO)
@@ -15,6 +17,7 @@ ALL_CATEGORIES = "52d8151df4f344bba4b5c56974213dbd"
 DB_ACCOUNT = DB_FORWARD_CHAT["accounts"]
 DB_CATEGORIES = DB_FORWARD_CHAT["categories"]
 DB_KEYWORD = DB_FORWARD_CHAT["keywords"]
+DB_REMOVEWORD = DB_FORWARD_CHAT["remove_words"]
 DB_REPLACE_WORD = DB_FORWARD_CHAT["replace_words"]
 DB_CRAWL = DB_FORWARD_CHAT["crawls"]
 DB_POST = DB_FORWARD_CHAT["posts"]
@@ -128,13 +131,14 @@ def test_db():
     mydict = { "id": str(uuid.uuid4().hex), "word": '\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', "replace": "long@gmail.com", "category_id": "52d8151df4f344bba4b5c56974213dar"}
     DB_REPLACE_WORD.insert_one(mydict)
 
-    mydict = { "id": str(uuid.uuid4().hex), "post_to": "t.me/chaneltestcrawl1",  "category_id": "52d8151df4f344bba4b5c56974213dap"}
+    mydict = { "id": str(uuid.uuid4().hex), "post_to": "t.me/chaneltestcrawl1", "type": "chanel",  "category_id": "52d8151df4f344bba4b5c56974213dap"}
     DB_POST.insert_one(mydict)
 
-    mydict = { "id": str(uuid.uuid4().hex), "post_to": "-1001553181857",  "category_id": "52d8151df4f344bba4b5c56974213dap"}
+    mydict = { "id": str(uuid.uuid4().hex), "post_to": "-1001553181857", "type": "chanel",  "category_id": "52d8151df4f344bba4b5c56974213dap"}
     DB_POST.insert_one(mydict)
 
     DB_TASK.insert_one({"id": str(CRAWL), "name": "Crawl", "cate_for": "account"})
     DB_TASK.insert_one({"id": str(POSTER), "name": "Post", "cate_for": "account"})
     DB_TASK.insert_one({"id": str(KEY_WORDS), "name": "Key Word", "cate_for": "filter"})
     DB_TASK.insert_one({"id": str(REPLACE_WORDS), "name": "Replace", "cate_for": "filter"})
+    DB_TASK.insert_one({"id": str(STOP_WORDS), "name": "Stop Words", "cate_for": "filter"})

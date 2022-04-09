@@ -244,6 +244,8 @@ async def categories():
             if int(type_id)<=2:
                 list_cate_results.append({"id": ALL_CATEGORIES, "type": '#', "name": "All"})
             query.update({"type_id": type_id})
+        else:
+            list_cate_results.append({"id": ALL_CATEGORIES, "type": '#', "name": "All"})
         cate_for = data.get("cate_for")
         if cate_for is not None:
             query.update({"cate_for": cate_for})
@@ -255,7 +257,9 @@ async def categories():
             typef = DB_TASK.find_one({"id": str(x["type_id"])})
             if typef is not None:
                 type_name = typef.get("name")
+                type_id = typef.get("id")
                 x["type"] = type_name
+                x["type_id"] = type_id
                 x.pop("_id")
                 list_cate_results.append(x)
         return jsonify(list_cate_results)
@@ -290,6 +294,44 @@ async def keyword():
         category_name = ""
         list_results = []
         for x in list_keyword:
+            category = DB_CATEGORIES.find_one({"id": x["category_id"]})
+            if category is not None:
+                category_name = category.get("name")
+                x["category"] = category_name
+                x.pop("_id")
+                list_results.append(x)
+        return jsonify(list_results)
+
+@app.route('/remove-word/<id>', methods=['DELETE'])
+async def delete_remove_word(id):
+    query = {"id": str(id)}
+    d = DB_REMOVEWORD.delete_many(query)
+    return jsonify({"message": "success", "status": 1})
+
+
+@app.route('/remove-words', methods=['GET', 'POST'])
+async def remove_word():
+    response_object = {'status': 0}
+    if request.method == 'POST':
+        post_data = await request.get_json()
+        remove_words = post_data.get("remove_words").split("|")
+        cate_id = post_data.get("cate_id")
+        if remove_words is not None:
+            for remove_word in remove_words:
+                mydict = { "id": str(uuid.uuid4().hex), "remove_word": remove_word, "category_id": cate_id}
+                DB_REMOVEWORD.insert_one(mydict)
+        response_object = {'status': 1}
+        return jsonify(response_object)
+    else:
+        get_data = request.args.to_dict(flat=True)
+        cat_id = get_data.get("cat_id")
+        if cat_id is not None:
+            list_remove_word = list(DB_REMOVEWORD.find({"category_id": cat_id}))
+        else:
+            list_remove_word = list(DB_REMOVEWORD.find({}))
+        category_name = ""
+        list_results = []
+        for x in list_remove_word:
             category = DB_CATEGORIES.find_one({"id": x["category_id"]})
             if category is not None:
                 category_name = category.get("name")
@@ -338,7 +380,7 @@ async def replace_words():
         return jsonify(list_results)
 
 @app.route('/craw-process/<id>', methods=['DELETE'])
-async def delete_craw_process(id):
+async def delete_crawl_process(id):
     query = {"id": str(id)}
     d = DB_CRAWL.delete_many(query)
     return jsonify({"message": "success", "status": 1})
@@ -346,7 +388,7 @@ async def delete_craw_process(id):
 
 
 @app.route('/craw-process', methods=['GET', 'POST'])
-async def craw_process():
+async def crawl_process():
     response_object = {'status': 0}
     if request.method == 'POST':
         post_data = await request.get_json()
@@ -400,6 +442,49 @@ async def craw_process():
                 x["category_replace_word_id"] = category_replace.get("id")
             list_results.append(x)
         return jsonify(list_results)
+
+@app.route('/post-process/<id>', methods=['DELETE'])
+async def delete_post_process(id):
+    query = {"id": str(id)}
+    d = DB_POST.delete_many(query)
+    return jsonify({"message": "success", "status": 1})
+    
+
+
+@app.route('/post-process', methods=['GET', 'POST'])
+async def post_process():
+    response_object = {'status': 0}
+    if request.method == 'POST':
+        post_data = await request.get_json()
+        posts_to = post_data.get("posts_to").split("|")
+        _type = post_data.get("type")
+        cate_id = post_data.get("category_post")
+
+        for post_to in posts_to:
+            mydict = { "id": str(uuid.uuid4().hex), "post_to": post_to.replace(" ", ""), "type": _type, "category_id": cate_id}
+            DB_POST.insert_one(mydict)
+        response_object = {'status': 1}
+        return jsonify(response_object)
+    else:
+        get_data = request.args
+        cat_id = get_data.get("cat_id")
+        if cat_id is not None:
+            list_post_process = list(DB_POST.find({"category_id": cat_id}))
+        else:
+            list_post_process = list(DB_POST.find({}))
+        category_name = ""
+        list_results = []
+
+        for x in list_post_process:
+            x.pop("_id")
+            category = DB_CATEGORIES.find_one({"id": x["category_id"]})
+            if category is not None:
+                category_name = category.get("name")
+                x["category_post"] = category_name
+                x["category_post_id"] = category.get("id")
+            list_results.append(x)
+        return jsonify(list_results)
+
 
 @app.route('/reload-db', methods=['GET'])
 async def reload_db():

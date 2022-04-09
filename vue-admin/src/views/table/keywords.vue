@@ -55,8 +55,10 @@
 
 <script>
 export default {
+  name: 'Keywords',
   data() {
     return {
+      cate_id: this.$route.params.cate_id,
       keywords: [],
       addKeyWords: {
         list_keyword: [],
@@ -89,7 +91,12 @@ export default {
     },
     getKeyWorlds() {
       this.listLoading = true
-      fetch(this.base_app_api + '/keywords').then(async response => {
+      let sub_url = '/keywords'
+      console.log(!this.cate_id)
+      if (!!this.cate_id) {
+        sub_url = sub_url + '?cat_id=' + this.cate_id
+      }
+      fetch(this.base_app_api + sub_url).then(async response => {
         const datas = await response.json()
         this.keywords = datas
         this.listLoading = false

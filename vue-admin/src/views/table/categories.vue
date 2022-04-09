@@ -15,6 +15,7 @@
             <el-option label="Post" value="2" />
             <el-option label="Key Words" value="3" />
             <el-option label="Words Replace" value="4" />
+            <el-option label="Stop Words" value="5" />
           </el-select>
         </el-form-item>
         <el-form-item>
@@ -45,7 +46,7 @@
         </el-table-column>
         <el-table-column label="Type" width="110" align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.type }}</span>
+            <a @click="changeType(scope.row.type_id)"> <span>{{ scope.row.type }}</span> </a>
           </template>
         </el-table-column>
         <el-table-column label="Setting" width="110" align="center">
@@ -71,6 +72,7 @@ export default {
   },
   data() {
     return {
+      type_id: '',
       list: null,
       listLoading: true,
       categories: [],
@@ -105,6 +107,20 @@ export default {
         console.log(response)
         this.$router.go(this.$router.currentRoute)
       })
+    },
+    changeType(id) {
+      this.listLoading = true
+      
+      let sub_url = '/categories'
+      if (!!id) {
+        sub_url = sub_url + '?type_id=' + id
+      }
+      fetch(this.base_app_api + sub_url).then(async response => {
+        const datas = await response.json()
+        this.list = datas
+        this.listLoading = false
+      })
+      // this.type_id = id
     },
     fetchData() {
       this.listLoading = true

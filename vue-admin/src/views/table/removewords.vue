@@ -1,20 +1,17 @@
 <template>
   <div class="modal-vue">
-    <div v-if="open" class="overlay" @click="modalClose"></div>
+    <div v-if="open" class="overlay" @click="modelClose"></div>
     <div v-if="open" class="modal">
-      <button class="close" @click="modalClose">x</button>
-      <h3>Title</h3>
-      <el-form ref="form" :model="addReplaceWords" label-width="120px">
+      <button class="close" @click="open = false">x</button>
+      <h3>Stop Words Add</h3>
+      <el-form ref="form" :model="addRemoveWords" label-width="120px">
         <el-form-item label="Category">
-          <el-select v-model="addReplaceWords.cate_id" placeholder="please select category">
+          <el-select v-model="addRemoveWords.cate_id" placeholder="please select category">
             <el-option v-for="(cat, idx) in arrayCates" :key="idx" :label="cat.name" :value="cat.value" />
           </el-select>
         </el-form-item>
-        <el-form-item label="Word">
-          <el-input v-model="addReplaceWords.list_keyword" type="textarea" />
-        </el-form-item>
-        <el-form-item label="Replace">
-          <el-input v-model="addReplaceWords.replace" type="textarea" />
+        <el-form-item label="Words">
+          <el-input v-model="addRemoveWords.list_removeword" type="textarea" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="addCate">Create</el-button>
@@ -25,7 +22,7 @@
       <el-button type="primary" @click="modalShow">Add</el-button>
       <el-table
         v-loading="listLoading"
-        :data="replacewords"
+        :data="remove_words"
         element-loading-text="Loading"
         border
         fit
@@ -36,17 +33,12 @@
             {{ scope.$index }}
           </template>
         </el-table-column>
-        <el-table-column label="Keyword" align="center">
+        <el-table-column label="Stop Word" align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.word }}</span>
+            <span>{{ scope.row.remove_word }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="Replace" align="center">
-          <template slot-scope="scope">
-            <span>{{ scope.row.replace }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column label="Category" width="110" align="center">
+        <el-table-column label="Category" width="150" align="center">
           <template slot-scope="scope">
             <span>{{ scope.row.category }}</span>
           </template>
@@ -65,11 +57,9 @@
 export default {
   data() {
     return {
-      cate_id: this.$route.params.cate_id,
-      replacewords: [],
-      addReplaceWords: {
-        list_keyword: [],
-        replace: '',
+      remove_words: [],
+      addRemoveWords: {
+        list_removeword: [],
         cate_id: ''
       },
       listLoading: false,
@@ -81,62 +71,59 @@ export default {
       }
     }
   },
+  components: {
+  },
   methods: {
     addCate() {
       const requestOptions = {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          'words': this.addReplaceWords.list_keyword,
-          'replace': this.addReplaceWords.replace,
-          'cate_id': this.addReplaceWords.cate_id
+          'remove_words': this.addRemoveWords.list_removeword,
+          'cate_id': this.addRemoveWords.cate_id
         })
       }
-      fetch(this.base_app_api + '/replace-words', requestOptions).then(async response => {
+      fetch(this.base_app_api + '/remove-words', requestOptions).then(async response => {
         this.$router.go(this.$router.currentRoute)
       })
     },
-    getReplaceWorlds() {
+    getRemoveWorlds() {
       this.listLoading = true
-      let sub_url = '/replace-words'
-      if (!!this.cate_id) {
-        sub_url = sub_url + '?cat_id=' + this.cate_id
-      }
-      fetch(this.base_app_api + sub_url).then(async response => {
+      fetch(this.base_app_api + '/remove-words').then(async response => {
         const datas = await response.json()
-        this.replacewords = datas
+        this.remove_words = datas
         this.listLoading = false
       })
     },
-    deleteByID(id) {
-      fetch(this.base_app_api + '/replace-word/' + id, { method: 'DELETE' }).then(async response => {
-        console.log(response)
-        this.$router.go(this.$router.currentRoute)
-      })
-    },
     getCategory(id) {
-      fetch(this.base_app_api + '/categories?type_id=4').then(async response => {
+      fetch(this.base_app_api + '/categories?type_id=5').then(async response => {
         const datas = await response.json()
         for (var i = 0; i < datas.length; i += 1) {
           this.arrayCates.push({ name: datas[i].name, value: datas[i].id })
+          console.log(datas[i].id)
         }
-        console.log(this.arrayCates)
+      })
+    },
+    deleteByID(id) {
+      fetch(this.base_app_api + '/remove-word/' + id, { method: 'DELETE' }).then(async response => {
+        console.log(response)
+        this.$router.go(this.$router.currentRoute)
       })
     },
     modalShow() {
       this.getCategory()
       this.open = true
     },
-    modalClose() {
+    modelClose() {
       this.open = false
       this.arrayCates = []
     },
     methodToRunOnSelect(payload) {
-      this.addReplaceWords.cate_id = payload.value
+      this.addRemoveWords.cate_id = payload.value
     }
   },
   created() {
-    this.getReplaceWorlds()
+    this.getRemoveWorlds()
   }
 }
 </script>
