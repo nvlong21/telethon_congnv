@@ -10,9 +10,9 @@
         </el-form-item>
         <el-form-item label="Type">
           <el-select v-model="addCrawlProcess.type" placeholder="please select category">
-            <el-option label="User" value="1" />
-            <el-option label="Chanel" value="2" />
-            <el-option label="Group" value="3" />
+            <el-option label="User" value="User" />
+            <el-option label="Chanel" value="Chanel" />
+            <el-option label="Group" value="Group" />
           </el-select>
         </el-form-item>
         <el-form-item label="Category Crawl">
