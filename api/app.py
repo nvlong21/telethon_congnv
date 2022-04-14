@@ -4,7 +4,7 @@ import hypercorn.asyncio
 from quart import Quart, jsonify, render_template_string, request
 from quart_cors import cors
 import asyncio
-import logging
+from loguru import logger
 from telethon.tl.patched import MessageService
 from telethon.errors.rpcerrorlist import FloodWaitError
 from telethon import TelegramClient, utils
@@ -12,13 +12,12 @@ from mongo import *
 import uuid
 from multiprocessing.dummy import Process, Queue
 import service
-# tele_account = mydb["accounts"] 
+
+logger.add("logs/file_1.log", rotation="500 MB")
 def get_env(name, message):
     if name in os.environ:
         return os.environ[name]
     return input(message)
-
-
 # Session name, API ID and hash to use; loaded from environmental variables
 #
 # API_ID = int(get_env('TG_API_ID', 'Enter your API ID: '))
@@ -36,38 +35,25 @@ app = cors(app, allow_origin="*")
 def process_phone(phone):
     return phone.replace(" ", "").replace("(", "").replace(")", "")
 
-# Helper method to format messages nicely
-async def format_message(message):
-    if message.photo:
-        content = '<img src="data:image/png;base64,{}" alt="{}" />'.format(
-            base64.b64encode(await message.download_media(bytes)).decode(),
-            message.raw_text
-        )
-    else:
-        # The Message parse_mode is 'html', so bold etc. will work!
-        content = (message.text or '(action message)').replace('\n', '<br>')
-
-    return '<p><strong>{}</strong>: {}<sub>{}</sub></p>'.format(
-        utils.get_display_name(message.sender),
-        content,
-        message.date
-    )
-
 
 # # Connect the client before we start serving with Quart
 @app.before_serving
 async def startup():
-    for x in DB_ACCOUNT.find({"status": 1}):
-        session = x["phone"]
-        cl = TelegramClient(session, API_ID, API_HASH)
-        await cl.connect()
-        if await cl.is_user_authorized():
-            service.CLIENTS[session] = cl
-        else:
-            myquery = { "phone":  session}
-            newvalues = { "$set": { "status": 0 } }
-            x = DB_ACCOUNT.update_many(myquery, newvalues)
-
+    for x in DB_ACCOUNT.find():
+        try:
+            session = x["phone"]
+            cl = TelegramClient(session, API_ID, API_HASH)
+            await cl.connect()
+            if await cl.is_user_authorized():
+                logger.info("Client {} activate!".format(str(session)))
+                service.CLIENTS[session] = cl
+            else:
+                myquery = { "phone":  session}
+                newvalues = { "$set": { "status": "not author" } }
+                x = DB_ACCOUNT.update_many(myquery, newvalues)
+                logger.info("Client {} not author!".format(str(session)))
+        except Exception as e:
+            logger.error(str(e))
 
 # # After we're done serving (near shutdown), clean up the client
 @app.after_serving
@@ -103,7 +89,7 @@ async def root():
                 if await client.is_user_authorized():
                     x = DB_ACCOUNT.find_one({"phone": phone_key})
                     if x is None:
-                        mydict = {"phone": phone_key, "status": 1}
+                        mydict = {"phone": phone_key, "status": "live"}
                         DB_ACCOUNT.insert_one(mydict)
                     return jsonify({"message": "Client is exist!", "status": 2})
 
@@ -113,7 +99,7 @@ async def root():
                     phone = post_data.get('phone')
                     response_object.update({"phone": phone})
                     filter = { 'phone': phone_key }
-                    newvalues = { "$set": { 'status': 1 } }
+                    newvalues = { "$set": { 'status': "live" } }
                     DB_ACCOUNT.update_one(filter, newvalues)
                     response_object.update({"status": 1, "message": "sussess"})
                     return jsonify(response_object)
@@ -127,7 +113,7 @@ async def root():
             else:
                 x = DB_ACCOUNT.find_one({"phone": phone_key})
                 if x is not None:
-                    if x.get("status", 0):
+                    if x.get("status") is not None:
                         new_client = TelegramClient(x.get("phone"), API_ID, API_HASH)
                         await new_client.connect()
                         if await new_client.is_user_authorized():
@@ -145,7 +131,7 @@ async def root():
                 await client.send_code_request(phone)
                 account_entrie = DB_ACCOUNT.find_one({"phone": phone_key})
                 if account_entrie is None:
-                    mydict = {"phone": phone_key, "status": 1}
+                    mydict = {"phone": phone_key, "status": "live"}
                     DB_ACCOUNT.insert_one(mydict)
     
                 response_object.update({"status": 1, "message": "Send code done!"})
@@ -530,7 +516,9 @@ async def main():
 # explicit about the event loop.
 if __name__ == '__main__':
     # run_init()
-    loop = asyncio.get_event_loop()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    # loop = asyncio.get_event_loop()
     loop.create_task(service.Sender())
     loop.create_task(main())
     Process(loop.run_until_complete(service.Crawl())).run()

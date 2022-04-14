@@ -8,7 +8,7 @@ from telethon import TelegramClient, utils
 from mongo import *
 import uuid
 import random
-
+from loguru import logger
 from  copy import deepcopy 
 import time
 from multiprocessing.dummy import Process, Queue
@@ -16,6 +16,7 @@ import re
 import threading
 # import nest_asyncio
 # nest_asyncio.apply()
+logger.add("logs/file_1.log", rotation="500 MB")
 def get_env(name, message):
     if name in os.environ:
         return os.environ[name]
@@ -38,7 +39,9 @@ def process_message(message, filters, stop_words, replaces):
     #     )
     # else:
     #     # The Message parse_mode is 'html', so bold etc. will work!
+    
     content = message.text
+    
     filter_flag = False
     for str_filter in filters:
         if str_filter.lower() in content.lower():
@@ -100,10 +103,12 @@ async def initial():
             if await cl.is_user_authorized():
                 list_client.append(cl)
                 CLIENTS[session_phone] = cl
+                logger.info("Client {} activate!".format(str(session_phone)))
             else:
                 query = { "phone":  session_phone}
-                new_values = { "$set": { "status": 0 } }
+                new_values = { "$set": { "status": "not author" } }
                 status = DB_ACCOUNT.update_many(query, new_values)
+                logger.info("Client {} not author!".format(str(session_phone)))
 
         CATEGORY_CRAWL_TEMP[cate_id]["clients"] = list_client
 
@@ -136,10 +141,11 @@ async def initial():
             stopword_query = {}
             if category_filter_id!=ALL_CATEGORIES:
                 stopword_query.update({"category_id": category_filter_id})
-            lst_stopwords_entri = DB_KEYWORD.find(stopword_query)
+            lst_stopwords_entri = DB_STOPWORD.find(stopword_query)
             for stopword_entri in lst_stopwords_entri:
                 str_filter = stopword_entri.get("stop_word")
-                lst_stopwords.append(str_filter)
+                if str_filter is not None:
+                    lst_stopwords.append(str_filter)
 
 
             lst_post_to_category = []
@@ -177,7 +183,7 @@ async def initial():
                 "replaces": lst_replace_word
             })
         CATEGORY_CRAWL_TEMP[cate_id]["from_chats"] = lst_dict_crawl
-    print("initial crawl done")
+    logger.info("initial crawl done")
     categories_keys = list(CATEGORY_CRAWL_TEMP.keys()).copy()
     for k in categories_keys:
         CATEGORY_CRAWL[k] = {
@@ -187,7 +193,6 @@ async def initial():
     await asyncio.sleep(0.1)
 
     CATEGORY_POST_TEMP = {}
-    print("initial post")
     categories_post = DB_CATEGORIES.find({"type_id": str(POSTER)})
     for category in list(categories_post):
         cate_id = category.get("id")
@@ -204,13 +209,14 @@ async def initial():
             except:
                 pass
             if await cl.is_user_authorized():
-                print(session_phone)
+                logger.info("Client {} activate!".format(str(session_phone)))
                 list_client.append(cl)
                 CLIENTS[session_phone] = cl
             else:
                 query = { "phone":  session_phone}
-                new_values = { "$set": { "status": 0 } }
+                new_values = { "$set": { "status": "not author" } }
                 status = DB_ACCOUNT.update_many(query, new_values)
+                logger.info("Client {} not author!".format(str(session_phone)))
         CATEGORY_POST_TEMP[cate_id]["clients"] = list_client
         post_to_query = {}
         if cate_id!=ALL_CATEGORIES:
@@ -226,7 +232,8 @@ async def initial():
         
         CATEGORY_POST_TEMP[cate_id]["post_to"] = lst_post_to
     categories_keys = list(CATEGORY_POST_TEMP.keys()).copy()
-    print("initial post done")
+
+    logger.info("initial post done")
     for k in categories_keys:
         CATEGORY_POST[k] = {
             "clients": CATEGORY_POST_TEMP[k]["clients"].copy(),
@@ -243,12 +250,45 @@ async def Sender():
     while 1:
         if not INIT:
             await asyncio.sleep(1.5)
+            SENDING = False
             continue
         SENDING = True
         categories_keys = list(CATEGORY_POST.keys()).copy()
         categories_cp = {}
         try:
             message = QUEUE_MESS.get_nowait()
+            categories_id = message.get("categories_id")
+            content = message.get("content")
+            for k in categories_id:
+
+                category_post = CATEGORY_POST.get(k)
+                lst_clients = category_post.get("clients")
+                client1 = None
+                for cl in lst_clients:
+                    if (cl is not None) or (await cl.is_user_authorized()):
+                        client1 = cl
+                        break
+                if client1 is None: 
+                    print("client is not activate")
+                    continue
+                lst_post_to = category_post.get("post_to")
+                # client1.send_message("me", "content")
+                for post_to in lst_post_to:
+                    try:
+                        # async with client1:
+                        await client1.send_message(intify(post_to), content)
+                        await asyncio.sleep(1.3)
+                        logger.info("Send to {} content {}".format(intify(post_to), content))
+                        # update_offset(forward, last_id)
+                    except FloodWaitError as fwe:
+                        print(f'{fwe}')
+                        asyncio.sleep(delay=fwe.seconds)
+                    except Exception as err:
+                        print(err)
+                        logging.exception(err)
+                        error_occured = True
+                        break
+            
         except Exception as e:
             await asyncio.sleep(1.3)
             continue
@@ -257,38 +297,8 @@ async def Sender():
         #         "clients": CATEGORY_POST[k]["clients"].copy(),
         #         "post_to": deepcopy(CATEGORY_CRAWL[k].get("post_to"))
         #     }
-        
-        categories_id = message.get("categories_id")
-        content = message.get("content")
-        for k in categories_id:
-            category_post = CATEGORY_POST.get(k)
-            lst_clients = category_post.get("clients")
-            client1 = None
-            for cl in lst_clients:
-                if (cl is not None) or (await cl.is_user_authorized()):
-                    client1 = cl
-                    break
-            if client1 is None: 
-                print("client is not activate")
-                continue
-            lst_post_to = category_post.get("post_to")
-            # client1.send_message("me", "content")
-            for post_to in lst_post_to:
-                try:
-                    # async with client1:
-                    await client1.send_message(intify(post_to), content)
-                    await asyncio.sleep(1.3)
-                    print('forwarding message')
-                    # update_offset(forward, last_id)
-                except FloodWaitError as fwe:
-                    print(f'{fwe}')
-                    asyncio.sleep(delay=fwe.seconds)
-                except Exception as err:
-                    print(err)
-                    logging.exception(err)
-                    error_occured = True
-                    break
         SENDING = False
+        
     await asyncio.sleep(0.1)
 
 async def Crawl():
@@ -303,10 +313,10 @@ async def Crawl():
                 try:
                     await CLIENTS[k].disconnect()
                 except:
-                    print("disconnect")
+                    logger.info("Disconnect client {} ".format(str(k)))
             await initial()
             INIT = True
-
+        
         categories_keys = list(CATEGORY_CRAWL.keys()).copy()
         categories_cp = {}
         for k in categories_keys:
@@ -314,6 +324,8 @@ async def Crawl():
                 "clients": CATEGORY_CRAWL[k]["clients"].copy(),
                 "from_chats": deepcopy(CATEGORY_CRAWL[k].get("from_chats"))
             }
+        # logger.info("Crawl ")
+
         for k in CATEGORY_CRAWL.keys():
             
             category_crawl = CATEGORY_CRAWL[k]
@@ -326,8 +338,9 @@ async def Crawl():
                     client = cl
                     break
             if client is None: 
-                print("send client is not activate")
+                logger.error("send client is not activate")
                 continue
+
             lst_dict_from_chat = category_crawl["from_chats"]
             for dict_from_chat in lst_dict_from_chat:
                 id = dict_from_chat.get("id")
@@ -345,11 +358,12 @@ async def Crawl():
                         # offset = str(message.id)
                         
                         dict_from_chat["offset"] = message.id
+                        logger.info("Crawl from {} offset {}".format(from_chat, message.id))
                         if isinstance(message, MessageService):
                             continue
                         if message.photo:
                             continue
-                        content = process_message(message, filters, replaces)
+                        content = process_message(message, filters, stop_words, replaces)
                         if content =="":
                             continue
                         message.text = "[{}] ".format(intify(from_chat)) + content
@@ -375,6 +389,7 @@ async def Crawl():
                 except Exception as e:
                     print(e)
         await asyncio.sleep(0.1)
+        
 def run_init():
     try:
         loop = asyncio.new_event_loop()
@@ -384,24 +399,3 @@ def run_init():
     except Exception as e:
         loop = asyncio.get_event_loop()
         loop.create_task(initial())
-        # loop.create_task(initial_post())
-        
-# tele = TeleProcess()
-
-# loop.run_forever()
-
-# run(tele)
-# run2(tele)target=analysis, args=("samplequery",)
-# asyncio.run(Crawl())
-# Process(target = asyncio.run(Crawl()), args=()).start()
-# def run3(tele): 
-#     async def main():
-#         await asyncio.gather(
-#             tele.Crawl(),
-#             tele.Sender(),
-#         )
-#     loop = get_or_create_eventloop()
-#     future = asyncio.ensure_future( main())
-#     loop.run_until_complete(future)
-# run3(tele) 
-# asyncio.run(main())

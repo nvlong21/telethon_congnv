@@ -32,31 +32,31 @@ def drop_all():
     DB_POST.drop()
     DB_STOPWORD.drop()
     
-drop_all()
+# drop_all()
 def test_db():
-    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925905936", "task_id": str(CRAWL), "category_id": "coin", "status": 1}
+    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925905936", "task_id": str(CRAWL), "category_id": "coin", "status": "live"}
     DB_ACCOUNT.insert_one(mydict)
 
-    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925899891", "task_id": str(CRAWL), "category_id": "coin", "status": 1}
+    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925899891", "task_id": str(CRAWL), "category_id": "coin", "status": "live"}
     DB_ACCOUNT.insert_one(mydict)
-    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925919435", "task_id": str(CRAWL), "category_id": "coin", "status": 1}
-    DB_ACCOUNT.insert_one(mydict)
-
-    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925926503", "task_id": str(CRAWL), "category_id": "trade", "status": 1}
+    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925919435", "task_id": str(CRAWL), "category_id": "coin", "status": "live"}
     DB_ACCOUNT.insert_one(mydict)
 
-    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925957599", "task_id": str(CRAWL), "category_id": "trade", "status": 1}
+    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925926503", "task_id": str(CRAWL), "category_id": "trade", "status": "live"}
     DB_ACCOUNT.insert_one(mydict)
 
-
-    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925967881", "task_id": str(POSTER), "category_id": "52d8151df4f344bba4b5c56974213dap"}
+    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925957599", "task_id": str(CRAWL), "category_id": "trade", "status": "live"}
     DB_ACCOUNT.insert_one(mydict)
 
 
-    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925974502", "task_id": str(POSTER), "category_id": "52d8151df4f344bba4b5c56974213dap"}
+    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925967881", "task_id": str(POSTER), "category_id": "52d8151df4f344bba4b5c56974213dap", "status": "live"}
     DB_ACCOUNT.insert_one(mydict)
 
-    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925982905", "task_id": str(POSTER), "category_id": "52d8151df4f344bba4b5c56974213dap"}
+
+    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925974502", "task_id": str(POSTER), "category_id": "52d8151df4f344bba4b5c56974213dap", "status": "live"}
+    DB_ACCOUNT.insert_one(mydict)
+
+    mydict = { "id": str(uuid.uuid4().hex), "phone": "84925982905", "task_id": str(POSTER), "category_id": "52d8151df4f344bba4b5c56974213dap", "status": "live"}
     DB_ACCOUNT.insert_one(mydict)
 
 
