@@ -10,3 +10,4 @@ hypercorn
 quart
 quart_cors
 pymongo
+loguru
