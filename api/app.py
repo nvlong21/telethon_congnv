@@ -64,7 +64,13 @@ async def cleanup():
 @app.route('/session/<id>', methods=['DELETE'])
 async def delete_session(id):
     query = {"id": str(id)}
-    DB_ACCOUNT.delete_many(query)
+    x = DB_ACCOUNT.find_one(query)
+    if x is not None:
+        phone = x.get("phone")
+        phone = process_phone(phone)
+        phone_key = phone.replace("+", "")
+        service.CLIENTS.pop(phone_key)
+        DB_ACCOUNT.delete_many(query)
     return jsonify({"message": "success", "status": 1})
 
 @app.route('/sessions', methods=['GET', 'POST'])
@@ -89,9 +95,12 @@ async def root():
                 if await client.is_user_authorized():
                     x = DB_ACCOUNT.find_one({"phone": phone_key})
                     if x is None:
-                        mydict = {"phone": phone_key, "status": "live"}
+                        mydict = {"id": str(uuid.uuid4().hex), "phone": phone_key, "status": "live"}
                         DB_ACCOUNT.insert_one(mydict)
-                    return jsonify({"message": "Client is exist!", "status": 2})
+                    else:
+                        if x.get("status") == "live":
+                            return jsonify({"message": "Client is exist!", "status": 2})
+
 
             if code is not None:
                 await client.sign_in(code=post_data.get("code"))
@@ -107,18 +116,18 @@ async def root():
                 filter = { 'phone': phone_key }
                 newvalues = { "$set": { "task_id": task_id , "category_id": cate_id} }
                 DB_ACCOUNT.update_one(filter, newvalues)
-
                 response_object.update({"status": 1, "message": "All done!"})
                 return jsonify(response_object)
             else:
-                x = DB_ACCOUNT.find_one({"phone": phone_key})
-                if x is not None:
-                    if x.get("status") is not None:
-                        new_client = TelegramClient(x.get("phone"), API_ID, API_HASH)
-                        await new_client.connect()
-                        if await new_client.is_user_authorized():
-                            response_object.update({"message": "Client is running!", "status": 2 })
-                            return jsonify(response_object)
+                # x = DB_ACCOUNT.find_one({"phone": phone_key})
+                # if x is not None:
+                #     if x.get("status") != "live":
+                #         new_client = TelegramClient(x.get("phone"), API_ID, API_HASH)
+                #         await new_client.connect()
+                #         if await new_client.is_user_authorized():
+
+                #             response_object.update({"message": "Client is running!", "status": 2 })
+                #             return jsonify(response_object)
                     # else:
                     #     task_id = post_data.get('task_id')
                     #     cate_id = post_data.get('category_id')
@@ -131,7 +140,7 @@ async def root():
                 await client.send_code_request(phone)
                 account_entrie = DB_ACCOUNT.find_one({"phone": phone_key})
                 if account_entrie is None:
-                    mydict = {"phone": phone_key, "status": "live"}
+                    mydict = {"id": str(uuid.uuid4().hex), "phone": phone_key, "status": "live"}
                     DB_ACCOUNT.insert_one(mydict)
     
                 response_object.update({"status": 1, "message": "Send code done!"})
@@ -139,10 +148,11 @@ async def root():
         except Exception as e:
             if phone_key in service.CLIENTS.keys():
                 service.CLIENTS.pop(phone_key)
-                new_dict = { "$set": {"status": 1}}
+                new_dict = { "$set": {"status": "not activate"}}
                 query = { "phone":  phone_key}
                 x = DB_ACCOUNT.update_many(query, new_dict)
             return jsonify({"message": str(e), "status": 0})
+
     elif request.method == 'GET':
         try:
             list_session = []
@@ -153,7 +163,7 @@ async def root():
                 data = {
                     "id": x.get("id", "#"),
                     "phone": x.get("phone", "#"),
-                    "status": x.get("status", "#")
+                    "status": x.get("status", "not activate")
                 }
                 if task is not None:
                     data.update({"task": task.get("name", "#")})

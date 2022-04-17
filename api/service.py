@@ -14,8 +14,16 @@ import time
 from multiprocessing.dummy import Process, Queue
 import re
 import threading
-# import nest_asyncio
-# nest_asyncio.apply()
+# from kafka import KafkaConsumer, KafkaProducer
+# from kafka.coordinator.assignors.range import RangePartitionAssignor
+# from kafka.coordinator.assignors.roundrobin import RoundRobinPartitionAssignor
+# import socket
+# from kafka.structs import OffsetAndMetadata, TopicPartition
+# from kafka.admin import KafkaAdminClient, NewTopic
+
+
+
+import json
 logger.add("logs/file_1.log", rotation="500 MB")
 def get_env(name, message):
     if name in os.environ:
@@ -25,6 +33,25 @@ def get_env(name, message):
 API_ID = "14225107" #os.getenv('api_id')
 API_HASH = "bc6b2686eea4dc38f72181dd8d279dbf" #os.getenv('api_hash')
 SESSION =  str(uuid.uuid4().hex)#os.getenv('STRING_SESSION')
+# bootstrap_servers = get_env("BOOTSTRAP_SERVER", "localhost:9092")
+# partition_assignment_strategy = [
+#                 RangePartitionAssignor,
+#                 RoundRobinPartitionAssignor]
+# admin_client = None
+# try:
+#     admin_client = KafkaAdminClient(
+#         bootstrap_servers=bootstrap_servers, 
+#         client_id="{}".format(socket.gethostname())
+#     )
+
+#     topic_list = []
+#     topic_list.append(NewTopic(name="topic", num_partitions=1, replication_factor=1))
+#     admin_client.create_topics(new_topics=topic_list, validate_only=False)
+# except:
+#     pass
+# finally:
+#     if admin_client is not None:
+#         admin_client.close()
 def intify(string):
     try:
         return int(string)
@@ -247,6 +274,14 @@ async def Sender():
     global CATEGORY_POST
     global INIT
     global SENDING
+    # consumer = KafkaConsumer(group_id = "{}_1".format(socket.gethostname()), client_id="{}".format(socket.gethostname()),
+    #                                    bootstrap_servers=  [bootstrap_servers], # "10.68.10.95:9092", #self.bootstrap_servers,#
+    #                                 #    key_deserializer=lambda key: key.decode(),
+    #                                    value_deserializer=lambda value: json.loads(value.decode()),
+    #                                    partition_assignment_strategy=partition_assignment_strategy,
+    #                                    auto_offset_reset="earliest", api_version = (0, 10, 1))
+    # # consumer.assign([TopicPartition('topic', 2)])
+    # consumer.subscribe("topic")
     while 1:
         if not INIT:
             await asyncio.sleep(1.5)
@@ -256,11 +291,17 @@ async def Sender():
         categories_keys = list(CATEGORY_POST.keys()).copy()
         categories_cp = {}
         try:
+            # raw_messages = consumer.poll(timeout_ms=100, max_records=10)
             message = QUEUE_MESS.get_nowait()
+            await asyncio.sleep(0.1)
+            # for _, msgs in raw_messages.items():
+            #     for msg in msgs:
+            #         message = msg.value
             categories_id = message.get("categories_id")
             content = message.get("content")
+            logger.info("content {}".format(content))
+            logger.info("categories_id {}".format(" - ".join(categories_id)))
             for k in categories_id:
-
                 category_post = CATEGORY_POST.get(k)
                 lst_clients = category_post.get("clients")
                 client1 = None
@@ -269,7 +310,7 @@ async def Sender():
                         client1 = cl
                         break
                 if client1 is None: 
-                    print("client is not activate")
+                    logger.info("Send client is not activate")
                     continue
                 lst_post_to = category_post.get("post_to")
                 # client1.send_message("me", "content")
@@ -307,6 +348,9 @@ async def Crawl():
     global INIT
     global SENDING
     global CLIENTS
+
+    # prediction_producer = KafkaProducer(bootstrap_servers= [bootstrap_servers],
+    #                     value_serializer=lambda value: json.dumps(value).encode())
     while True:
         if not INIT and not SENDING:
             for k in CLIENTS.keys():
@@ -327,7 +371,6 @@ async def Crawl():
         # logger.info("Crawl ")
 
         for k in CATEGORY_CRAWL.keys():
-            
             category_crawl = CATEGORY_CRAWL[k]
             lst_clients = category_crawl.get("clients")
             client = None
@@ -373,6 +416,11 @@ async def Crawl():
                                     "categories_id": lst_post_to_category,
                                     "content": content
                                 })
+                            # prediction_producer.send("topic",
+                            #                             value = {
+                            #                             "categories_id": lst_post_to_category,
+                            #                             "content": content
+                            #                         })
                             filter = { 'id': id }
                             newvalues = { "$set": { "offset": message.id} }
                             DB_CRAWL.update_one(filter, newvalues)

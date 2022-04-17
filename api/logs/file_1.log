@@ -7132,3 +7132,299 @@ You will see the FTT credited to your FTX OTC wallet immediately (https://otc.ft
 2022-04-14 15:03:06.517 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 376
 2022-04-14 15:03:06.519 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 377
 2022-04-14 15:03:06.519 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 377
+2022-04-17 11:20:44.428 | INFO     | service:initial:111 - Client 84925905936 not author!
+2022-04-17 11:20:44.428 | INFO     | service:initial:111 - Client 84925905936 not author!
+2022-04-17 11:20:44.479 | INFO     | __main__:startup:54 - Client 84925905936 not author!
+2022-04-17 11:20:44.479 | INFO     | __main__:startup:54 - Client 84925905936 not author!
+2022-04-17 11:20:44.725 | ERROR    | __main__:startup:56 - The authorization key (session file) was used under two different IP addresses simultaneously, and can no longer be used. Use the same session exclusively, or use different sessions (caused by InvokeWithLayerRequest)
+2022-04-17 11:20:44.725 | ERROR    | __main__:startup:56 - The authorization key (session file) was used under two different IP addresses simultaneously, and can no longer be used. Use the same session exclusively, or use different sessions (caused by InvokeWithLayerRequest)
+2022-04-17 11:20:44.738 | INFO     | service:initial:111 - Client 84925899891 not author!
+2022-04-17 11:20:44.738 | INFO     | service:initial:111 - Client 84925899891 not author!
+2022-04-17 11:20:45.022 | INFO     | __main__:startup:54 - Client 84925919435 not author!
+2022-04-17 11:20:45.022 | INFO     | __main__:startup:54 - Client 84925919435 not author!
+2022-04-17 11:20:45.134 | INFO     | service:initial:111 - Client 84925919435 not author!
+2022-04-17 11:20:45.134 | INFO     | service:initial:111 - Client 84925919435 not author!
+2022-04-17 11:20:45.283 | ERROR    | __main__:startup:56 - The authorization key (session file) was used under two different IP addresses simultaneously, and can no longer be used. Use the same session exclusively, or use different sessions (caused by InvokeWithLayerRequest)
+2022-04-17 11:20:45.283 | ERROR    | __main__:startup:56 - The authorization key (session file) was used under two different IP addresses simultaneously, and can no longer be used. Use the same session exclusively, or use different sessions (caused by InvokeWithLayerRequest)
+2022-04-17 11:20:45.455 | INFO     | service:initial:111 - Client 84925926503 not author!
+2022-04-17 11:20:45.455 | INFO     | service:initial:111 - Client 84925926503 not author!
+2022-04-17 11:20:45.698 | INFO     | __main__:startup:48 - Client 84925957599 activate!
+2022-04-17 11:20:45.698 | INFO     | __main__:startup:48 - Client 84925957599 activate!
+2022-04-17 11:20:45.823 | INFO     | service:initial:106 - Client 84925957599 activate!
+2022-04-17 11:20:45.823 | INFO     | service:initial:106 - Client 84925957599 activate!
+2022-04-17 11:20:45.828 | INFO     | service:initial:186 - initial crawl done
+2022-04-17 11:20:45.828 | INFO     | service:initial:186 - initial crawl done
+2022-04-17 11:20:46.063 | INFO     | __main__:startup:48 - Client 84925967881 activate!
+2022-04-17 11:20:46.063 | INFO     | __main__:startup:48 - Client 84925967881 activate!
+2022-04-17 11:20:46.321 | INFO     | service:initial:212 - Client 84925967881 activate!
+2022-04-17 11:20:46.321 | INFO     | service:initial:212 - Client 84925967881 activate!
+2022-04-17 11:20:46.365 | INFO     | __main__:startup:48 - Client 84925974502 activate!
+2022-04-17 11:20:46.365 | INFO     | __main__:startup:48 - Client 84925974502 activate!
+2022-04-17 11:20:46.601 | INFO     | service:initial:212 - Client 84925974502 activate!
+2022-04-17 11:20:46.601 | INFO     | service:initial:212 - Client 84925974502 activate!
+2022-04-17 11:20:46.706 | INFO     | __main__:startup:48 - Client 84925982905 activate!
+2022-04-17 11:20:46.706 | INFO     | __main__:startup:48 - Client 84925982905 activate!
+2022-04-17 11:20:46.891 | INFO     | service:initial:212 - Client 84925982905 activate!
+2022-04-17 11:20:46.891 | INFO     | service:initial:212 - Client 84925982905 activate!
+2022-04-17 11:20:46.893 | INFO     | service:initial:236 - initial post done
+2022-04-17 11:20:46.893 | INFO     | service:initial:236 - initial post done
+2022-04-17 11:20:46.994 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:46.994 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:47.119 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 1
+2022-04-17 11:20:47.119 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 1
+2022-04-17 11:20:47.119 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 2
+2022-04-17 11:20:47.119 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 2
+2022-04-17 11:20:47.120 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 3
+2022-04-17 11:20:47.120 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 3
+2022-04-17 11:20:47.120 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 4
+2022-04-17 11:20:47.120 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 4
+2022-04-17 11:20:47.120 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 5
+2022-04-17 11:20:47.120 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 5
+2022-04-17 11:20:47.120 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 6
+2022-04-17 11:20:47.120 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 6
+2022-04-17 11:20:47.120 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 7
+2022-04-17 11:20:47.120 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 7
+2022-04-17 11:20:47.121 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 8
+2022-04-17 11:20:47.121 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 8
+2022-04-17 11:20:47.121 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 9
+2022-04-17 11:20:47.121 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 9
+2022-04-17 11:20:47.121 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 10
+2022-04-17 11:20:47.121 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 10
+2022-04-17 11:20:47.121 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 11
+2022-04-17 11:20:47.121 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 11
+2022-04-17 11:20:47.122 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 12
+2022-04-17 11:20:47.122 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 12
+2022-04-17 11:20:47.122 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 13
+2022-04-17 11:20:47.122 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 13
+2022-04-17 11:20:47.122 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 14
+2022-04-17 11:20:47.122 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 14
+2022-04-17 11:20:47.122 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 15
+2022-04-17 11:20:47.122 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 15
+2022-04-17 11:20:47.123 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 16
+2022-04-17 11:20:47.123 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 16
+2022-04-17 11:20:47.123 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 17
+2022-04-17 11:20:47.123 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 17
+2022-04-17 11:20:47.123 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 18
+2022-04-17 11:20:47.123 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 18
+2022-04-17 11:20:47.123 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 19
+2022-04-17 11:20:47.123 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 19
+2022-04-17 11:20:47.124 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 20
+2022-04-17 11:20:47.124 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 20
+2022-04-17 11:20:47.124 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 21
+2022-04-17 11:20:47.124 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 21
+2022-04-17 11:20:47.124 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 22
+2022-04-17 11:20:47.124 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 22
+2022-04-17 11:20:47.124 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 23
+2022-04-17 11:20:47.124 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 23
+2022-04-17 11:20:47.125 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 24
+2022-04-17 11:20:47.125 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 24
+2022-04-17 11:20:47.125 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 25
+2022-04-17 11:20:47.125 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 25
+2022-04-17 11:20:47.125 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 26
+2022-04-17 11:20:47.125 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 26
+2022-04-17 11:20:47.125 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 27
+2022-04-17 11:20:47.125 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 27
+2022-04-17 11:20:47.126 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 28
+2022-04-17 11:20:47.126 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 28
+2022-04-17 11:20:47.126 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 29
+2022-04-17 11:20:47.126 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 29
+2022-04-17 11:20:47.126 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 30
+2022-04-17 11:20:47.126 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 30
+2022-04-17 11:20:47.126 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 31
+2022-04-17 11:20:47.126 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 31
+2022-04-17 11:20:47.127 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 32
+2022-04-17 11:20:47.127 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 32
+2022-04-17 11:20:48.631 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 33
+2022-04-17 11:20:48.631 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 33
+2022-04-17 11:20:48.631 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 34
+2022-04-17 11:20:48.631 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 34
+2022-04-17 11:20:48.631 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 35
+2022-04-17 11:20:48.631 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 35
+2022-04-17 11:20:48.631 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 36
+2022-04-17 11:20:48.631 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 36
+2022-04-17 11:20:48.632 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 37
+2022-04-17 11:20:48.632 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 37
+2022-04-17 11:20:48.632 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 38
+2022-04-17 11:20:48.632 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 38
+2022-04-17 11:20:48.632 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 39
+2022-04-17 11:20:48.632 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 39
+2022-04-17 11:20:48.632 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 40
+2022-04-17 11:20:48.632 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 40
+2022-04-17 11:20:48.632 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 41
+2022-04-17 11:20:48.632 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 41
+2022-04-17 11:20:48.633 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 42
+2022-04-17 11:20:48.633 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 42
+2022-04-17 11:20:48.633 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 43
+2022-04-17 11:20:48.633 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 43
+2022-04-17 11:20:48.633 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 44
+2022-04-17 11:20:48.633 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 44
+2022-04-17 11:20:48.633 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 45
+2022-04-17 11:20:48.633 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 45
+2022-04-17 11:20:48.633 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 46
+2022-04-17 11:20:48.633 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 46
+2022-04-17 11:20:48.633 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 47
+2022-04-17 11:20:48.633 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 47
+2022-04-17 11:20:48.634 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 48
+2022-04-17 11:20:48.634 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 48
+2022-04-17 11:20:48.634 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 49
+2022-04-17 11:20:48.634 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 49
+2022-04-17 11:20:48.634 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 50
+2022-04-17 11:20:48.634 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 50
+2022-04-17 11:20:48.634 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 51
+2022-04-17 11:20:48.634 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 51
+2022-04-17 11:20:48.634 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 52
+2022-04-17 11:20:48.634 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 52
+2022-04-17 11:20:48.635 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 53
+2022-04-17 11:20:48.635 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 53
+2022-04-17 11:20:48.635 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 54
+2022-04-17 11:20:48.635 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 54
+2022-04-17 11:20:48.635 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 55
+2022-04-17 11:20:48.635 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 55
+2022-04-17 11:20:48.635 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 56
+2022-04-17 11:20:48.635 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 56
+2022-04-17 11:20:48.635 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 57
+2022-04-17 11:20:48.635 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 57
+2022-04-17 11:20:48.636 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 58
+2022-04-17 11:20:48.636 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 58
+2022-04-17 11:20:48.636 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 59
+2022-04-17 11:20:48.636 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 59
+2022-04-17 11:20:48.636 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 60
+2022-04-17 11:20:48.636 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 60
+2022-04-17 11:20:48.636 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 61
+2022-04-17 11:20:48.636 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 61
+2022-04-17 11:20:48.636 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 62
+2022-04-17 11:20:48.636 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 62
+2022-04-17 11:20:48.637 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 63
+2022-04-17 11:20:48.637 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 63
+2022-04-17 11:20:48.637 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 64
+2022-04-17 11:20:48.637 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 64
+2022-04-17 11:20:48.637 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 65
+2022-04-17 11:20:48.637 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 65
+2022-04-17 11:20:48.637 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 66
+2022-04-17 11:20:48.637 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 66
+2022-04-17 11:20:48.637 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 67
+2022-04-17 11:20:48.637 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 67
+2022-04-17 11:20:48.638 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 68
+2022-04-17 11:20:48.638 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 68
+2022-04-17 11:20:48.638 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 69
+2022-04-17 11:20:48.638 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 69
+2022-04-17 11:20:48.638 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 70
+2022-04-17 11:20:48.638 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 70
+2022-04-17 11:20:48.638 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 71
+2022-04-17 11:20:48.638 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 71
+2022-04-17 11:20:48.639 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 72
+2022-04-17 11:20:48.639 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 72
+2022-04-17 11:20:48.639 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 73
+2022-04-17 11:20:48.639 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 73
+2022-04-17 11:20:48.639 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 74
+2022-04-17 11:20:48.639 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 74
+2022-04-17 11:20:48.639 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 75
+2022-04-17 11:20:48.639 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 75
+2022-04-17 11:20:48.639 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 76
+2022-04-17 11:20:48.639 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 76
+2022-04-17 11:20:48.640 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 77
+2022-04-17 11:20:48.640 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 77
+2022-04-17 11:20:48.640 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 78
+2022-04-17 11:20:48.640 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 78
+2022-04-17 11:20:48.640 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 79
+2022-04-17 11:20:48.640 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 79
+2022-04-17 11:20:48.640 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 80
+2022-04-17 11:20:48.640 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 80
+2022-04-17 11:20:48.640 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 81
+2022-04-17 11:20:48.640 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 81
+2022-04-17 11:20:48.641 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 82
+2022-04-17 11:20:48.641 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 82
+2022-04-17 11:20:48.641 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 83
+2022-04-17 11:20:48.641 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 83
+2022-04-17 11:20:48.641 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 84
+2022-04-17 11:20:48.641 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 84
+2022-04-17 11:20:48.641 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 85
+2022-04-17 11:20:48.641 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 85
+2022-04-17 11:20:48.641 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 87
+2022-04-17 11:20:48.641 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 87
+2022-04-17 11:20:48.642 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 88
+2022-04-17 11:20:48.642 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 88
+2022-04-17 11:20:48.642 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 90
+2022-04-17 11:20:48.642 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 90
+2022-04-17 11:20:48.642 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 91
+2022-04-17 11:20:48.642 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 91
+2022-04-17 11:20:48.642 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 92
+2022-04-17 11:20:48.642 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 92
+2022-04-17 11:20:48.643 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 93
+2022-04-17 11:20:48.643 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 93
+2022-04-17 11:20:48.643 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 94
+2022-04-17 11:20:48.643 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 94
+2022-04-17 11:20:48.643 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 95
+2022-04-17 11:20:48.643 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 95
+2022-04-17 11:20:48.643 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 96
+2022-04-17 11:20:48.643 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 96
+2022-04-17 11:20:48.644 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 97
+2022-04-17 11:20:48.644 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 97
+2022-04-17 11:20:48.644 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 99
+2022-04-17 11:20:48.644 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 99
+2022-04-17 11:20:48.644 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 100
+2022-04-17 11:20:48.644 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 100
+2022-04-17 11:20:48.644 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 101
+2022-04-17 11:20:48.644 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 101
+2022-04-17 11:20:48.644 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 102
+2022-04-17 11:20:48.644 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 102
+2022-04-17 11:20:48.645 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 103
+2022-04-17 11:20:48.645 | INFO     | service:Crawl:361 - Crawl from https://t.me/FTX_Official offset 103
+2022-04-17 11:20:48.746 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:48.746 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:48.848 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:48.848 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:48.949 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:48.949 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.051 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.051 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.152 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.152 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.253 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.253 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.354 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.354 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.457 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.457 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.558 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.558 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.659 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.659 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.761 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.761 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.863 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.863 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.965 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:49.965 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.067 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.067 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.169 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.169 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.271 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.271 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.373 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.373 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.474 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.474 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.577 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.577 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.680 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.680 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.782 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.782 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.883 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.883 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.985 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:50.985 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:51.089 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:51.089 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:51.190 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:51.190 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:51.293 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:51.293 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:51.395 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:51.395 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:51.496 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:51.496 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:51.597 | ERROR    | service:Crawl:341 - send client is not activate
+2022-04-17 11:20:51.597 | ERROR    | service:Crawl:341 - send client is not activate

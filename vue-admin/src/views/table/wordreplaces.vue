@@ -93,6 +93,10 @@ export default {
         })
       }
       fetch(this.base_app_api + '/replace-words', requestOptions).then(async response => {
+        fetch(this.base_app_api + '/reload-db').then(async response => {
+          const datas = await response.json()
+          console.log(datas)
+        })
         this.$router.go(this.$router.currentRoute)
       })
     },
@@ -110,7 +114,10 @@ export default {
     },
     deleteByID(id) {
       fetch(this.base_app_api + '/replace-word/' + id, { method: 'DELETE' }).then(async response => {
-        console.log(response)
+        fetch(this.base_app_api + '/reload-db').then(async response => {
+          const datas = await response.json()
+          console.log(datas)
+        })
         this.$router.go(this.$router.currentRoute)
       })
     },

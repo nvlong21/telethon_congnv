@@ -206,7 +206,10 @@ export default {
     },
     deleteByID(id) {
       fetch(this.base_app_api + '/craw-process/' + id, { method: 'DELETE' }).then(async response => {
-        
+        fetch(this.base_app_api + '/reload-db').then(async response => {
+          const datas = await response.json()
+          console.log(datas)
+        })
         this.$router.go(this.$router.currentRoute)
       })
     },

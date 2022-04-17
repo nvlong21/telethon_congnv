@@ -79,7 +79,7 @@
         </el-table-column>
         <el-table-column label="Setting" width="110" align="center">
           <template slot-scope="scope">
-            <el-button style="padding: 2px 5px;" type="danger" @click="deleteByID(scope.row.id)">Delete</el-button>
+            <el-button style="padding: 2px 5px;" type="danger" @click="deleteByID(scope.row.phone)">Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -147,6 +147,10 @@ export default {
             if (this.telesession.task_id != null) {
               this.telesession.task_id = null
               this.open_add_task = false
+              fetch(this.base_app_api + '/reload-db').then(async response => {
+                const datas = await response.json()
+                console.log(datas)
+              })
               this.$router.go(this.$router.currentRoute)
             }
           }
@@ -159,7 +163,10 @@ export default {
     },
     deleteByID(id) {
       fetch(this.base_app_api + '/session/' + id, { method: 'DELETE' }).then(async response => {
-        console.log(response)
+        fetch(this.base_app_api + '/reload-db').then(async response => {
+          const datas = await response.json()
+          console.log(datas)
+        })
         this.$router.go(this.$router.currentRoute)
       })
     },
