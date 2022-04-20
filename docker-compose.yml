@@ -29,8 +29,8 @@ services:
     environment:
       MONGO: mongodb://mongo:27017/
       BOOTSTRAP_SERVER: kafka:9092
-    # volumes:
-    # - .:/opt
+    volumes:
+    - ./mount_data:/opt/logs
     links:
     - mongo
     - kafka
