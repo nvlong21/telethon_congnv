@@ -310,7 +310,7 @@ async def Sender():
                         client1 = cl
                         break
                 if client1 is None: 
-                    logger.info("Send client is not activate")
+                    logger.info("All send client is not activate")
                     continue
                 lst_post_to = category_post.get("post_to")
                 # client1.send_message("me", "content")
@@ -381,7 +381,7 @@ async def Crawl():
                     client = cl
                     break
             if client is None: 
-                logger.error("send client is not activate")
+                logger.error("All crawl client is not activate")
                 continue
 
             lst_dict_from_chat = category_crawl["from_chats"]
@@ -415,7 +415,7 @@ async def Crawl():
                                 {
                                     "categories_id": lst_post_to_category,
                                     "content": content
-                                })
+                                }) 
                             # prediction_producer.send("topic",
                             #                             value = {
                             #                             "categories_id": lst_post_to_category,
