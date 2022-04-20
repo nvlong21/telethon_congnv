@@ -61,15 +61,16 @@ async def cleanup():
     for k in service.CLIENTS.keys():
         await service.CLIENTS[k].disconnect()
 
-@app.route('/session/<id>', methods=['DELETE'])
-async def delete_session(id):
-    query = {"id": str(id)}
+@app.route('/session/<phone>', methods=['DELETE'])
+async def delete_session(phone):
+    query = {"phone": str(phone)}
     x = DB_ACCOUNT.find_one(query)
     if x is not None:
         phone = x.get("phone")
         phone = process_phone(phone)
         phone_key = phone.replace("+", "")
-        service.CLIENTS.pop(phone_key)
+        if phone_key in service.CLIENTS.keys():
+            service.CLIENTS.pop(phone_key)
         DB_ACCOUNT.delete_many(query)
     return jsonify({"message": "success", "status": 1})
 
@@ -175,38 +176,11 @@ async def root():
             return jsonify({"message": "error", "status": 0})
 
 
-# @app.route('/verify-code', methods=['GET', 'POST'])
-# async def verifycode():
-#     # We want to update the global phone variable to remember it
-#     global phone
-#     global client
-#     global SESSION
-#     if client is None:
-#         # Telethon client
-#         client = TelegramClient(SESSION, API_ID, API_HASH)
-#         await client.connect()
-#     response_object = {'status': 0}
-#     if request.method == 'POST':
-#         post_data = await request.get_json()
-#         await client.sign_in(code=post_data.get("code"))
-#         if await client.is_user_authorized():
-#             phone = post_data.get('phone')
-#             response_object.update({"phone": phone})
-#             filter = { 'phone': process_phone(phone).replace("+", "") }
-#             newvalues = { "$set": { 'status': 1 } }
-#             DB_ACCOUNT.update_one(filter, newvalues)
-#             SESSION = str(uuid.uuid4().hex)
-#             client = None
-#             phone = None
-#             response_object.update({"status": 1, "message": "sussess"})
-#             return jsonify(response_object)
-#     return jsonify({"status": 0, "message": "error"})
-
 
 @app.route('/init-exam', methods=['GET', 'POST'])
 async def init_exam():
     test_db()
-    return jsonify({"status": 1})
+    return jsonify({"message": "success", "status": 1})
 
 
 @app.route('/task', methods=['GET', 'POST'])
@@ -229,7 +203,7 @@ async def categories():
         type_id = post_data.get("type_id")
         mydict = { "id": str(uuid.uuid4().hex), "name": cate_name, "type_id": type_id}
         DB_CATEGORIES.insert_one(mydict)
-        response_object = {'status': 1}
+        response_object = {"message": "success", 'status': 1}
         return jsonify(response_object)
     else:
         list_cate_results = []
@@ -278,7 +252,7 @@ async def keyword():
             for keyword in keywords:
                 mydict = { "id": str(uuid.uuid4().hex), "keyword": keyword, "category_id": cate_id}
                 DB_KEYWORD.insert_one(mydict)
-        response_object = {'status': 1}
+        response_object = {"message": "success", 'status': 1}
         return jsonify(response_object)
     else:
         get_data = request.args.to_dict(flat=True)
@@ -316,7 +290,7 @@ async def remove_word():
             for remove_word in remove_words:
                 mydict = { "id": str(uuid.uuid4().hex), "stop_word": remove_word, "category_id": cate_id}
                 DB_STOPWORD.insert_one(mydict)
-        response_object = {'status': 1}
+        response_object = {"message": "success", 'status': 1}
         return jsonify(response_object)
     else:
         get_data = request.args.to_dict(flat=True)
@@ -355,7 +329,7 @@ async def replace_words():
         cate_id = post_data.get("cate_id")
         mydict = { "id": str(uuid.uuid4().hex), "word": word, "replace": replace, "category_id": cate_id}
         DB_REPLACE_WORD.insert_one(mydict)
-        response_object = {'status': 1}
+        response_object = {"message": "success", 'status': 1}
         return jsonify(response_object)
     else:
         get_data = request.args
@@ -400,7 +374,7 @@ async def crawl_process():
                 "category_keyword_id": category_keyword_id, "category_stopword_id": category_stopword_id, "category_post_id": category_post_id,
                 "category_replace_id": category_replace_id, "offset": 0}
             DB_CRAWL.insert_one(mydict)
-        response_object = {'status': 1}
+        response_object = {"message": "success", 'status': 1}
         return jsonify(response_object)
     else:
         get_data = request.args
@@ -466,7 +440,7 @@ async def post_process():
         for post_to in posts_to:
             mydict = { "id": str(uuid.uuid4().hex), "post_to": post_to.replace(" ", ""), "type": _type, "category_id": cate_id}
             DB_POST.insert_one(mydict)
-        response_object = {'status': 1}
+        response_object = {"message": "success", 'status': 1}
         return jsonify(response_object)
     else:
         get_data = request.args

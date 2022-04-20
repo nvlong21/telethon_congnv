@@ -164,9 +164,10 @@ export default {
     deleteByID(id) {
       fetch(this.base_app_api + '/session/' + id, { method: 'DELETE' }).then(async response => {
         fetch(this.base_app_api + '/reload-db').then(async response => {
-          const datas = await response.json()
-          console.log(datas)
+          
         })
+        const datas = await response.json()
+        alert(datas.message)
         this.$router.go(this.$router.currentRoute)
       })
     },

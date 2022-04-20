@@ -4,20 +4,20 @@
     <div v-if="open" class="modal">
       <button class="close" @click="modalClose">x</button>
       <h3>Title</h3>
-      <el-form ref="form" :model="addCrawlProcess" label-width="120px">
+      <el-form ref="form" :model="addPostProcess" label-width="120px">
         <el-form-item label="Post To">
-          <el-input v-model="addCrawlProcess.list_from" type="textarea" />
+          <el-input v-model="addPostProcess.list_from" type="textarea" />
         </el-form-item>
         <el-form-item label="Type">
-          <el-select v-model="addCrawlProcess.type" placeholder="please select category">
-            <el-option label="User" value="1" />
-            <el-option label="Chanel" value="2" />
-            <el-option label="Group" value="3" />
+          <el-select v-model="addPostProcess.type" placeholder="please select category">
+            <el-option label="User" value="User" />
+            <el-option label="Chanel" value="Chanel" />
+            <el-option label="Group" value="Group" />
           </el-select>
         </el-form-item>
 
         <el-form-item label="Post To">
-          <el-select v-model="addCrawlProcess.category_post" placeholder="please select category">
+          <el-select v-model="addPostProcess.category_post" placeholder="please select category">
             <el-option v-for="(cat, idx) in arrayCatesPost" :key="idx" :label="cat.name" :value="cat.value" />
           </el-select>
         </el-form-item>
@@ -73,13 +73,10 @@ export default {
     return {
       cate_id: this.$route.params.cate_id,
       crawlProcess: [],
-      addCrawlProcess: {
+      addPostProcess: {
         list_from: [],
         type: '',
-        category_crawl: '',
-        category_post: '',
-        category_word: '',
-        category_replace_word: ''
+        category_post: ''
       },
       listLoading: false,
       arrayCatesReplaceWord: [],
@@ -99,16 +96,17 @@ export default {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          'posts_to': this.addCrawlProcess.list_from,
-          'type': this.addCrawlProcess.type,
-          'category_post': this.addCrawlProcess.category_crawl
+          'posts_to': this.addPostProcess.list_from,
+          'type': this.addPostProcess.type,
+          'category_post': this.addPostProcess.category_post
         })
       }
       fetch(this.base_app_api + '/post-process', requestOptions).then(async response => {
         fetch(this.base_app_api + '/reload-db').then(async response => {
-          const datas = await response.json()
-          console.log(datas)
+          
         })
+        const datas = await response.json()
+        alert(datas.message)
         this.$router.go(this.$router.currentRoute)
       })
     },
@@ -158,9 +156,10 @@ export default {
     deleteByID(id) {
       fetch(this.base_app_api + '/post-process/' + id, { method: 'DELETE' }).then(async response => {
         fetch(this.base_app_api + '/reload-db').then(async response => {
-          const datas = await response.json()
-          console.log(datas)
+          
         })
+        const datas = await response.json()
+        alert(datas.message)
         this.$router.go(this.$router.currentRoute)
       })
     },

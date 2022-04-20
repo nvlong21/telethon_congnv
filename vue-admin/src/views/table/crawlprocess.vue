@@ -118,7 +118,7 @@ export default {
         category_post: '',
         category_word: '',
         category_replace_word: '',
-        category_stopword:''
+        category_stopword: ''
       },
       listLoading: false,
       arrayCatesReplaceWord: [],
@@ -144,14 +144,16 @@ export default {
           'cate_id': this.addCrawlProcess.category_crawl,
           'category_keyword_id': this.addCrawlProcess.category_word,
           'category_post_id': this.addCrawlProcess.category_post,
-          'category_replace_id': this.addCrawlProcess.category_replace_word
+          'category_replace_id': this.addCrawlProcess.category_replace_word,
+          'category_stopword_id': this.addCrawlProcess.category_stopword
         })
       }
       fetch(this.base_app_api + '/craw-process', requestOptions).then(async response => {
         fetch(this.base_app_api + '/reload-db').then(async response => {
-          const datas = await response.json()
-          console.log(datas)
+          
         })
+        const datas = await response.json()
+        alert(datas.message)
         this.$router.go(this.$router.currentRoute)
       })
     },
@@ -207,9 +209,10 @@ export default {
     deleteByID(id) {
       fetch(this.base_app_api + '/craw-process/' + id, { method: 'DELETE' }).then(async response => {
         fetch(this.base_app_api + '/reload-db').then(async response => {
-          const datas = await response.json()
-          console.log(datas)
+ 
         })
+        const datas = await response.json()
+        alert(datas.message)
         this.$router.go(this.$router.currentRoute)
       })
     },

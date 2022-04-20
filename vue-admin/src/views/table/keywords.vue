@@ -87,9 +87,10 @@ export default {
       }
       fetch(this.base_app_api + '/keywords', requestOptions).then(async response => {
         fetch(this.base_app_api + '/reload-db').then(async response => {
-          const datas = await response.json()
-          console.log(datas)
+
         })
+        const datas = await response.json()
+        alert(datas.message)
         this.$router.go(this.$router.currentRoute)
       })
 
@@ -119,9 +120,10 @@ export default {
     deleteByID(id) {
       fetch(this.base_app_api + '/keyword/' + id, { method: 'DELETE' }).then(async response => {
         fetch(this.base_app_api + '/reload-db').then(async response => {
-          const datas = await response.json()
-          console.log(datas)
+         
         })
+        const datas = await response.json()
+        alert(datas.message)
         this.$router.go(this.$router.currentRoute)
       })
     },

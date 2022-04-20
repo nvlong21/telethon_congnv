@@ -1,40 +1,17 @@
 version: '3'
 services:
-  # zookeeper:
-  #   image: 'bitnami/zookeeper:latest'
-  #   ports:
-  #     - '2181:2181'
-  #   environment:
-  #     - ALLOW_ANONYMOUS_LOGIN=yes
-  # kafka:
-  #   image: 'bitnami/kafka:latest'
-  #   ports:
-  #     - '9092:9092'
-  #   # volumes:
-  #   #   - kafka-persistence:/bitnami/kafka
-  #   environment:
-  #     - KAFKA_BROKER_ID=1
-  #     - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-  #     - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://192.168.0.9:9092
-  #     - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-  #     - ALLOW_PLAINTEXT_LISTENER=yes
-  #     - ALLOW_ANONYMOUS_LOGIN=yes
-  #     # - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
-  #   depends_on:
-  #     - zookeeper
   api:
     build: api
     ports:
     - "8001:8001"
     environment:
       MONGO: mongodb://mongo:27017/
-      BOOTSTRAP_SERVER: kafka:9092
+      BOOTSTRAP_SERVER: 192.168.0.9:9092
     volumes:
     - ./mount_data:/opt/logs
     links:
     - mongo
-    - kafka
-  
+    
   mongo:
     image: bitnami/mongodb
     # environment:

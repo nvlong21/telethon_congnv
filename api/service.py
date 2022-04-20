@@ -14,12 +14,12 @@ import time
 from multiprocessing.dummy import Process, Queue
 import re
 import threading
-# from kafka import KafkaConsumer, KafkaProducer
-# from kafka.coordinator.assignors.range import RangePartitionAssignor
-# from kafka.coordinator.assignors.roundrobin import RoundRobinPartitionAssignor
-# import socket
-# from kafka.structs import OffsetAndMetadata, TopicPartition
-# from kafka.admin import KafkaAdminClient, NewTopic
+from kafka import KafkaConsumer, KafkaProducer
+from kafka.coordinator.assignors.range import RangePartitionAssignor
+from kafka.coordinator.assignors.roundrobin import RoundRobinPartitionAssignor
+import socket
+from kafka.structs import OffsetAndMetadata, TopicPartition
+from kafka.admin import KafkaAdminClient, NewTopic
 
 
 
@@ -33,25 +33,25 @@ def get_env(name, message):
 API_ID = "14225107" #os.getenv('api_id')
 API_HASH = "bc6b2686eea4dc38f72181dd8d279dbf" #os.getenv('api_hash')
 SESSION =  str(uuid.uuid4().hex)#os.getenv('STRING_SESSION')
-# bootstrap_servers = get_env("BOOTSTRAP_SERVER", "localhost:9092")
-# partition_assignment_strategy = [
-#                 RangePartitionAssignor,
-#                 RoundRobinPartitionAssignor]
-# admin_client = None
-# try:
-#     admin_client = KafkaAdminClient(
-#         bootstrap_servers=bootstrap_servers, 
-#         client_id="{}".format(socket.gethostname())
-#     )
+bootstrap_servers = get_env("BOOTSTRAP_SERVER", "localhost:9092")
+partition_assignment_strategy = [
+                RangePartitionAssignor,
+                RoundRobinPartitionAssignor]
+admin_client = None
+try:
+    admin_client = KafkaAdminClient(
+        bootstrap_servers=bootstrap_servers, 
+        client_id="{}".format(socket.gethostname())
+    )
 
-#     topic_list = []
-#     topic_list.append(NewTopic(name="topic", num_partitions=1, replication_factor=1))
-#     admin_client.create_topics(new_topics=topic_list, validate_only=False)
-# except:
-#     pass
-# finally:
-#     if admin_client is not None:
-#         admin_client.close()
+    topic_list = []
+    topic_list.append(NewTopic(name="topic", num_partitions=1, replication_factor=1))
+    admin_client.create_topics(new_topics=topic_list, validate_only=False)
+except:
+    pass
+finally:
+    if admin_client is not None:
+        admin_client.close()
 def intify(string):
     try:
         return int(string)
@@ -119,14 +119,16 @@ async def initial():
         lst_client_crawl = DB_ACCOUNT.find({"category_id": cate_id})
         list_client = []
         for sess in lst_client_crawl:
+            
             session_phone = sess["phone"]
             cl = CLIENTS.get(session_phone)
             if cl is None:
                 cl = TelegramClient(session_phone, API_ID, API_HASH)
             try:
                 await cl.connect()
-            except:
-                pass
+            except Exception as e:
+                logger.error(str(e))
+
             if await cl.is_user_authorized():
                 list_client.append(cl)
                 CLIENTS[session_phone] = cl
@@ -136,7 +138,7 @@ async def initial():
                 new_values = { "$set": { "status": "not author" } }
                 status = DB_ACCOUNT.update_many(query, new_values)
                 logger.info("Client {} not author!".format(str(session_phone)))
-
+            
         CATEGORY_CRAWL_TEMP[cate_id]["clients"] = list_client
 
         craw_query = {}
@@ -233,8 +235,9 @@ async def initial():
                 cl = TelegramClient(session_phone, API_ID, API_HASH)
             try:
                 await cl.connect()
-            except:
-                pass
+            except Exception as e:
+                logger.error(str(e))
+
             if await cl.is_user_authorized():
                 logger.info("Client {} activate!".format(str(session_phone)))
                 list_client.append(cl)
@@ -274,14 +277,16 @@ async def Sender():
     global CATEGORY_POST
     global INIT
     global SENDING
-    # consumer = KafkaConsumer(group_id = "{}_1".format(socket.gethostname()), client_id="{}".format(socket.gethostname()),
-    #                                    bootstrap_servers=  [bootstrap_servers], # "10.68.10.95:9092", #self.bootstrap_servers,#
-    #                                 #    key_deserializer=lambda key: key.decode(),
-    #                                    value_deserializer=lambda value: json.loads(value.decode()),
-    #                                    partition_assignment_strategy=partition_assignment_strategy,
-    #                                    auto_offset_reset="earliest", api_version = (0, 10, 1))
+    consumer = KafkaConsumer(group_id = "{}_1".format(socket.gethostname()), client_id="{}".format(socket.gethostname()),
+                                       bootstrap_servers=  [bootstrap_servers], # "10.68.10.95:9092", #self.bootstrap_servers,#
+                                    #    key_deserializer=lambda key: key.decode(),
+                                       value_deserializer=lambda value: json.loads(value.decode()),
+                                       partition_assignment_strategy=partition_assignment_strategy,
+                                       auto_offset_reset="earliest", api_version = (0, 10, 1))
     # # consumer.assign([TopicPartition('topic', 2)])
-    # consumer.subscribe("topic")
+    consumer.subscribe("topic")
+    producer = KafkaProducer(bootstrap_servers= [bootstrap_servers],
+                        value_serializer=lambda value: json.dumps(value).encode())
     while 1:
         if not INIT:
             await asyncio.sleep(1.5)
@@ -291,45 +296,51 @@ async def Sender():
         categories_keys = list(CATEGORY_POST.keys()).copy()
         categories_cp = {}
         try:
-            # raw_messages = consumer.poll(timeout_ms=100, max_records=10)
-            message = QUEUE_MESS.get_nowait()
+            raw_messages = consumer.poll(timeout_ms=100, max_records=10)
+            # message = QUEUE_MESS.get_nowait()
             await asyncio.sleep(0.1)
-            # for _, msgs in raw_messages.items():
-            #     for msg in msgs:
-            #         message = msg.value
-            categories_id = message.get("categories_id")
-            content = message.get("content")
-            logger.info("content {}".format(content))
-            logger.info("categories_id {}".format(" - ".join(categories_id)))
-            for k in categories_id:
-                category_post = CATEGORY_POST.get(k)
-                lst_clients = category_post.get("clients")
-                client1 = None
-                for cl in lst_clients:
-                    if (cl is not None) or (await cl.is_user_authorized()):
-                        client1 = cl
-                        break
-                if client1 is None: 
-                    logger.info("All send client is not activate")
-                    continue
-                lst_post_to = category_post.get("post_to")
-                # client1.send_message("me", "content")
-                for post_to in lst_post_to:
-                    try:
-                        # async with client1:
-                        await client1.send_message(intify(post_to), content)
-                        await asyncio.sleep(1.3)
-                        logger.info("Send to {} content {}".format(intify(post_to), content))
-                        # update_offset(forward, last_id)
-                    except FloodWaitError as fwe:
-                        print(f'{fwe}')
-                        asyncio.sleep(delay=fwe.seconds)
-                    except Exception as err:
-                        print(err)
-                        logging.exception(err)
-                        error_occured = True
-                        break
-            
+            for _, msgs in raw_messages.items():
+                for msg in msgs:
+                    message = msg.value
+                    categories_id = message.get("categories_id")
+                    content = message.get("content")
+                    # logger.info("content {}".format(content))
+                    # logger.info("categories_id {}".format(" - ".join(categories_id)))
+                    list_miss_category = []
+                    for k in categories_id:
+                        category_post = CATEGORY_POST.get(k)
+                        lst_clients = category_post.get("clients")
+                        client1 = None
+                        for cl in lst_clients:
+                            if (cl is not None) or (await cl.is_user_authorized()):
+                                client1 = cl
+                                break
+                        if client1 is None: 
+                            logger.info("All send client is not activate")
+                            list_miss_category.append(k)
+                            continue
+                        
+                        lst_post_to = category_post.get("post_to")
+                        # client1.send_message("me", "content")
+                        for post_to in lst_post_to:
+                            try:
+                                # async with client1:
+                                await client1.send_message(intify(post_to), content)
+                                await asyncio.sleep(1.3)
+                                logger.info("Send to {} content {}".format(intify(post_to), content))
+                                # update_offset(forward, last_id)
+                            except FloodWaitError as fwe:
+                                logger.error(fwe)
+                                asyncio.sleep(delay=fwe.seconds)
+                            except Exception as err:
+                                logger.error(err)
+                                error_occured = True
+                                break
+                    if len(list_miss_category) >0:
+                        producer.send("topic", value = {"categories_id": list_miss_category,
+                                                        "content": content
+                                                    })
+                        await asyncio.sleep(0.5)
         except Exception as e:
             await asyncio.sleep(1.3)
             continue
@@ -349,8 +360,8 @@ async def Crawl():
     global SENDING
     global CLIENTS
 
-    # prediction_producer = KafkaProducer(bootstrap_servers= [bootstrap_servers],
-    #                     value_serializer=lambda value: json.dumps(value).encode())
+    prediction_producer = KafkaProducer(bootstrap_servers= [bootstrap_servers],
+                        value_serializer=lambda value: json.dumps(value).encode())
     while True:
         if not INIT and not SENDING:
             for k in CLIENTS.keys():
@@ -411,16 +422,16 @@ async def Crawl():
                             continue
                         message.text = "[{}] ".format(intify(from_chat)) + content
                         try:
-                            QUEUE_MESS.put_nowait(
-                                {
-                                    "categories_id": lst_post_to_category,
-                                    "content": content
-                                }) 
-                            # prediction_producer.send("topic",
-                            #                             value = {
-                            #                             "categories_id": lst_post_to_category,
-                            #                             "content": content
-                            #                         })
+                            # QUEUE_MESS.put_nowait(
+                            #     {
+                            #         "categories_id": lst_post_to_category,
+                            #         "content": content
+                            #     }) 
+                            prediction_producer.send("topic",
+                                                        value = {
+                                                        "categories_id": lst_post_to_category,
+                                                        "content": content
+                                                    })
                             filter = { 'id': id }
                             newvalues = { "$set": { "offset": message.id} }
                             DB_CRAWL.update_one(filter, newvalues)
