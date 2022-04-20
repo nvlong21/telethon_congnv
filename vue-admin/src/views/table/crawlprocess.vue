@@ -168,7 +168,7 @@ export default {
       })
     },
     getCategory(id) {
-      fetch('http://localhost:8001/categories?type_id=1').then(async response => {
+      fetch(this.base_app_api + '/categories?type_id=1').then(async response => {
         const datas = await response.json()
         for (var i = 0; i < datas.length; i += 1) {
           this.arrayCatesCrawl.push({ name: datas[i].name, value: datas[i].id })
