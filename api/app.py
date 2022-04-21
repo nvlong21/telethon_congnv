@@ -364,7 +364,7 @@ async def crawl_process():
         post_data = await request.get_json()
         get_froms = post_data.get("froms").split("|")
         from_type = post_data.get("type")
-        cate_id = post_data.get("category_crawl")
+        cate_id = post_data.get("cate_id")
         category_keyword_id = post_data.get("category_keyword_id")
         category_stopword_id = post_data.get("category_stopword_id")
         category_post_id = post_data.get("category_post_id")

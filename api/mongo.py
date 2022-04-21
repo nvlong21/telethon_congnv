@@ -22,6 +22,21 @@ DB_REPLACE_WORD = DB_FORWARD_CHAT["replace_words"]
 DB_CRAWL = DB_FORWARD_CHAT["crawls"]
 DB_POST = DB_FORWARD_CHAT["posts"]
 DB_TASK = DB_FORWARD_CHAT["tasks"]
+temp = DB_TASK.find_one({"name": "Crawl"})
+if temp is None:
+    DB_TASK.insert_one({"id": str(CRAWL), "name": "Crawl", "cate_for": "account"})
+temp = DB_TASK.find_one({"name": "Post"})
+if temp is None:
+    DB_TASK.insert_one({"id": str(POSTER), "name": "Post", "cate_for": "account"})
+temp = DB_TASK.find_one({"name": "Key Word"})
+if temp is None:
+    DB_TASK.insert_one({"id": str(KEY_WORDS), "name": "Key Word", "cate_for": "filter"})
+temp = DB_TASK.find_one({"name": "Replace"})
+if temp is None:
+    DB_TASK.insert_one({"id": str(REPLACE_WORDS), "name": "Replace", "cate_for": "filter"})
+temp = DB_TASK.find_one({"name": "Stop Words"})
+if temp is None:
+    DB_TASK.insert_one({"id": str(STOP_WORDS), "name": "Stop Words", "cate_for": "filter"})
 def drop_all():
     DB_ACCOUNT.drop()
     DB_CATEGORIES.drop()
@@ -144,8 +159,4 @@ def test_db():
     mydict = { "id": str(uuid.uuid4().hex), "post_to": "-1001553181857", "type": "chanel",  "category_id": "52d8151df4f344bba4b5c56974213dap"}
     DB_POST.insert_one(mydict)
 
-    DB_TASK.insert_one({"id": str(CRAWL), "name": "Crawl", "cate_for": "account"})
-    DB_TASK.insert_one({"id": str(POSTER), "name": "Post", "cate_for": "account"})
-    DB_TASK.insert_one({"id": str(KEY_WORDS), "name": "Key Word", "cate_for": "filter"})
-    DB_TASK.insert_one({"id": str(REPLACE_WORDS), "name": "Replace", "cate_for": "filter"})
-    DB_TASK.insert_one({"id": str(STOP_WORDS), "name": "Stop Words", "cate_for": "filter"})
+    
