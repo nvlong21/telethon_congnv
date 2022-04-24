@@ -520,7 +520,7 @@ async def post_process():
 
 @app.route('/reload-db', methods=['GET'])
 async def reload_db():
-    new_dict = { "$set": {"status": "1"}}
+    new_dict = { "$set": { "status_crawl": "1", "status_sender": "1"}}
     query = { "name": "reload"}
     DB_LOG.update_many(query, new_dict)
     return jsonify({"status": "done"}) 

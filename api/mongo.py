@@ -26,12 +26,14 @@ DB_CRAWL = DB_FORWARD_CHAT["crawls"]
 DB_POST = DB_FORWARD_CHAT["posts"]
 DB_TASK = DB_FORWARD_CHAT["tasks"]
 DB_LOG = DB_FORWARD_CHAT["logs"]
-# temp = DB_LOG.find_one({"name": "reload"})
-# if temp is None:
-
-new_dict = { "$set": {"status_crawl": "0", "status_sender": "0"}}
-query = { "name": "reload"}
-DB_LOG.update_many(query, new_dict)
+temp = DB_LOG.find_one({"name": "reload"})
+if temp is None:
+    DB_LOG.insert_one({"name": "reload", "status_crawl": "1", "status_sender": "1"})
+else:
+    new_dict = { "$set": {"status_crawl": "0", "status_sender": "0"}}
+    query = { "name": "reload"}
+    DB_LOG.update_many(query, new_dict)
+    
 temp = DB_TASK.find_one({"name": "Crawl"})
 if temp is None:
     DB_TASK.insert_one({"id": str(CRAWL), "name": "Crawl", "cate_for": "account"})

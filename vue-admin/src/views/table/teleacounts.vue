@@ -167,7 +167,8 @@ export default {
         body: formData
       }
       fetch(this.base_app_api + '/sessions-upload', requestData).then(async response => {
-        console.log(await response.json())
+        const data = await response.json()
+        alert(data.message)
       })
 
     },

@@ -215,7 +215,7 @@ async def Crawl():
     while True:
         if (datetime.now() - last_activate_check).seconds > 10:
             temp = DB_LOG.find_one({"name": "reload"})
-            INIT = temp["status_crawl"] == 1
+            INIT = str(temp["status_crawl"]) == "0"
             new_dict = { "$set": {"status_crawl": "0"}}
             query = { "name": "reload"}
             DB_LOG.update_many(query, new_dict)
