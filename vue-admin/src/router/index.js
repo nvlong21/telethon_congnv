@@ -55,6 +55,17 @@ export const constantRoutes = [
     }]
   },
   {
+    path: '/logs',
+    component: Layout,
+    redirect: '/logs',
+    children: [{
+      path: 'logs',
+      name: 'Logs',
+      component: () => import('@/views/logs/index'),
+      meta: { title: 'Logs', icon: 'dashboard' }
+    }]
+  },
+  {
     path: '/tables',
     component: Layout,
     redirect: '/example/table',
@@ -106,7 +117,7 @@ export const constantRoutes = [
       }
     ]
   },
-
+  
   // {
   //   path: '/form',
   //   component: Layout,

@@ -1,0 +1,10 @@
+<template>
+  <div>
+    <input
+      type="file"
+      @change="onFileChanged($event)"
+      accept="image/*"
+      capture
+    />
+  </div>
+</template>

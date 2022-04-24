@@ -11,9 +11,9 @@ from telethon import TelegramClient, utils
 from mongo import *
 import uuid
 from multiprocessing.dummy import Process, Queue
-import service
+import glob
 
-logger.add("logs/file_1.log", rotation="500 MB")
+logger.add("logs/api/{time:YYYY-MM-DD}_1.log", rotation="500 MB")
 def get_env(name, message):
     if name in os.environ:
         return os.environ[name]
@@ -26,7 +26,7 @@ def get_env(name, message):
 API_ID = "14225107" #os.getenv('api_id')
 API_HASH = "bc6b2686eea4dc38f72181dd8d279dbf" #os.getenv('api_hash')
 SESSION =  "84986626975"#os.getenv('STRING_SESSION')
-
+CLIENTS = {}
 # Quart app
 app = Quart(__name__)
 app.secret_key = 'CHANGE THIS TO SOMETHING SECRET'
@@ -35,121 +35,98 @@ app = cors(app, allow_origin="*")
 def process_phone(phone):
     return phone.replace(" ", "").replace("(", "").replace(")", "")
 
-
 # # Connect the client before we start serving with Quart
 @app.before_serving
 async def startup():
-    for x in DB_ACCOUNT.find():
-        try:
-            session = x["phone"]
-            cl = TelegramClient(session, API_ID, API_HASH)
-            await cl.connect()
-            if await cl.is_user_authorized():
-                logger.info("Client {} activate!".format(str(session)))
-                service.CLIENTS[session] = cl
-            else:
-                myquery = { "phone":  session}
-                newvalues = { "$set": { "status": "not author" } }
-                x = DB_ACCOUNT.update_many(myquery, newvalues)
-                logger.info("Client {} not author!".format(str(session)))
-        except Exception as e:
-            logger.error(str(e))
-
+    pass
 # # After we're done serving (near shutdown), clean up the client
 @app.after_serving
 async def cleanup():
-    for k in service.CLIENTS.keys():
-        await service.CLIENTS[k].disconnect()
+    for k in CLIENTS.keys():
+        await CLIENTS[k].disconnect()
 
 @app.route('/session/<phone>', methods=['DELETE'])
 async def delete_session(phone):
     query = {"phone": str(phone)}
     x = DB_ACCOUNT.find_one(query)
     if x is not None:
-        phone = x.get("phone")
-        phone = process_phone(phone)
-        phone_key = phone.replace("+", "")
-        if phone_key in service.CLIENTS.keys():
-            service.CLIENTS.pop(phone_key)
         DB_ACCOUNT.delete_many(query)
     return jsonify({"message": "success", "status": 1})
 
+@app.route('/sessions-upload', methods=['POST'])
+async def sessions_upload():
+    files = await request.files
+    form = await request.form
+    task_id = form.get("task_id")
+    cate_id = form.get('category_id')
+    response_object = {}
+    file = files.get("file")
+    if file and file.filename:
+        await file.save(file.filename)
+        phone = file.filename.split(".")[0]
+        phone = process_phone(phone)
+        response_object.update({"phone": phone})
+        phone_key = phone.replace("+", "")
+        query = {"phone": str(phone_key)}
+        client_name = DB_ACCOUNT.find_one(query)
+        if client_name is None or (client_name.get("status") != "live"):
+            client = TelegramClient(phone_key, API_ID, API_HASH)
+            try:
+                await client.connect()
+                if await client.is_user_authorized():
+                    if client_name is None:
+                        mydict = {"id": str(uuid.uuid4().hex), "phone": phone_key, "status": "live"}
+                        DB_ACCOUNT.insert_one(mydict)
+                    else:
+                        filter = { 'phone': phone_key }
+                        newvalues = { "$set": { "task_id": task_id , "category_id": cate_id, "status": "live"} }
+                        DB_ACCOUNT.update_one(filter, newvalues)
+                    response_object.update({"status": "1", "message": "success"})
+                    client.disconnect()
+                else:
+                    response_object.update({"status": "0", "message": "Please upload client activated"})
+            except Exception as e:
+                response_object.update({"status": "0", "message": str(e)})
+        else:
+            return jsonify({"message": "Client is exist!", "status": 1})
+    return jsonify(response_object)
+
+
 @app.route('/sessions', methods=['GET', 'POST'])
-async def root():
+async def sessions():
     # We want to update the global phone variable to remember it
     response_object = {'status': 0}
     if request.method == 'POST':
         post_data = await request.get_json()
         phone = post_data.get('phone')
-        code = post_data.get("code")
-        task_id = post_data.get("task_id")
-        cate_id = post_data.get('category_id')
         phone = process_phone(phone)
         response_object.update({"phone": phone})
         phone_key = phone.replace("+", "")
-        client = service.CLIENTS.get(phone_key, None)
+        query = {"phone": str(phone_key)}
+        client_name = DB_ACCOUNT.find_one(query)
         try:
-            if client is None:
+            if client_name is None or (client_name.get("status")!="live"):
                 client = TelegramClient(phone_key, API_ID, API_HASH)
                 await client.connect()
-                service.CLIENTS[phone_key] = client
-                if await client.is_user_authorized():
-                    x = DB_ACCOUNT.find_one({"phone": phone_key})
-                    if x is None:
-                        mydict = {"id": str(uuid.uuid4().hex), "phone": phone_key, "status": "live"}
-                        DB_ACCOUNT.insert_one(mydict)
-                    else:
-                        if x.get("status") == "live":
-                            return jsonify({"message": "Client is exist!", "status": 2})
-
-
-            if code is not None:
-                await client.sign_in(code=post_data.get("code"))
-                if await client.is_user_authorized():
-                    phone = post_data.get('phone')
-                    response_object.update({"phone": phone})
-                    filter = { 'phone': phone_key }
-                    newvalues = { "$set": { 'status': "live" } }
-                    DB_ACCOUNT.update_one(filter, newvalues)
-                    response_object.update({"status": 1, "message": "sussess"})
-                    return jsonify(response_object)
-            elif task_id is not None:
-                filter = { 'phone': phone_key }
-                newvalues = { "$set": { "task_id": task_id , "category_id": cate_id} }
-                DB_ACCOUNT.update_one(filter, newvalues)
-                response_object.update({"status": 1, "message": "All done!"})
-                return jsonify(response_object)
-            else:
-                # x = DB_ACCOUNT.find_one({"phone": phone_key})
-                # if x is not None:
-                #     if x.get("status") != "live":
-                #         new_client = TelegramClient(x.get("phone"), API_ID, API_HASH)
-                #         await new_client.connect()
-                #         if await new_client.is_user_authorized():
-
-                #             response_object.update({"message": "Client is running!", "status": 2 })
-                #             return jsonify(response_object)
-                    # else:
-                    #     task_id = post_data.get('task_id')
-                    #     cate_id = post_data.get('category_id')
-                    #     new_dict = { "$set": {"phone": phone_key, "task_id": task_id , "category_id": cate_id}}
-                    #     query = { "phone":  phone_key}
-                    #     x = DB_ACCOUNT.update_many(query, new_dict)
-                    #     response_object.update({"status": 1, "message": "All done!"})
-                    #     return jsonify(response_object)
-
-                await client.send_code_request(phone)
-                account_entrie = DB_ACCOUNT.find_one({"phone": phone_key})
-                if account_entrie is None:
-                    mydict = {"id": str(uuid.uuid4().hex), "phone": phone_key, "status": "live"}
+                CLIENTS[phone_key] = client
+                if await CLIENTS[phone_key].is_user_authorized():
+                    mydict = {"phone": phone_key, "status": "live"}
                     DB_ACCOUNT.insert_one(mydict)
+                    response_object.update({"status": 2, "message": "Client is exists!"})
+                    await CLIENTS[phone_key].disconnect()
+                else:
+                    await CLIENTS[phone_key].send_code_request(phone)
+                    mydict = {"phone": phone_key, "status": "not author"}
+                    DB_ACCOUNT.insert_one(mydict)
+                    response_object.update({"status": 1, "message": "Send code done!"})
+            else:
+                response_object.update({"status": 2, "message": "Client is exists!"})
+            return jsonify(response_object)
     
-                response_object.update({"status": 1, "message": "Send code done!"})
-                return jsonify(response_object)
         except Exception as e:
-            if phone_key in service.CLIENTS.keys():
-                service.CLIENTS.pop(phone_key)
-                new_dict = { "$set": {"status": "not activate"}}
+            if phone_key in CLIENTS.keys():
+                CLIENTS.pop(phone_key)
+                new_dict = { "$set": {"status": "not author"}}
                 query = { "phone":  phone_key}
                 x = DB_ACCOUNT.update_many(query, new_dict)
             return jsonify({"message": str(e), "status": 0})
@@ -175,7 +152,87 @@ async def root():
         except:
             return jsonify({"message": "error", "status": 0})
 
+@app.route('/sessions-code', methods=['GET', 'POST'])
+async def sessions_code():
+    # We want to update the global phone variable to remember it
+    response_object = {'status': 0}
+    if request.method == 'POST':
+        post_data = await request.get_json()
+        phone = post_data.get('phone')
+        phone = process_phone(phone)
+        code = post_data.get("code")
+        response_object.update({"phone": phone})
+        phone_key = phone.replace("+", "")
+        try:
+            if phone_key in CLIENTS.keys():
+                query = {"phone": str(phone_key)}
+                client_name = DB_ACCOUNT.find_one(query)
+                if await CLIENTS[phone_key].is_user_authorized():
+                    if client_name is None:
+                        mydict = {"id": str(uuid.uuid4().hex), "phone": phone_key, "status": "live"}
+                        DB_ACCOUNT.insert_one(mydict)
+                        response_object.update({"status": 2, "message": "Client is activate"})
+                    else:
+                        if client_name.get("status") == "live":
+                            return jsonify({"message": "Client is exist!", "status": 2})
+                        else:
+                            newvalues = { "$set": { "task_id": task_id , "category_id": cate_id, "status": "live"} }
+                            DB_ACCOUNT.update_one(query, newvalues)
+                    await CLIENTS[phone_key].disconnect()
+                else:
+                    if code is not None:
+                        await CLIENTS[phone_key].sign_in(code=code)
+                        if await client.is_user_authorized():
+                            newvalues = { "$set": { 'status': "live" } }
+                            DB_ACCOUNT.update_one(query, newvalues)
+                            response_object.update({"status": 2, "message": "sussess"})
+                            CLIENTS[phone_key].disconnect()
+                        else:
+                            newvalues = { "$set": { 'status': "not author" } }
+                            DB_ACCOUNT.update_one(query, newvalues)
+                            response_object.update({"status": 0, "message": "Code is not correct!"})
+                    else:
+                        response_object.update({"status": 0, "message": "Code error"})
+            return jsonify(response_object)
 
+        except Exception as e:
+            if phone_key in CLIENTS.keys():
+                CLIENTS.pop(phone_key)
+                new_dict = { "$set": {"status": "not author"}}
+                query = { "phone":  phone_key}
+                x = DB_ACCOUNT.update_many(query, new_dict)
+            return jsonify({"message": str(e), "status": 0})
+
+@app.route('/sessions-task', methods=['GET', 'POST'])
+async def sessions_task():
+    # We want to update the global phone variable to remember it
+    response_object = {'status': 0}
+    if request.method == 'POST':
+        post_data = await request.get_json()
+        phone = post_data.get('phone')
+        phone = process_phone(phone)
+        task_id = post_data.get("task_id")
+        cate_id = post_data.get('category_id')
+        response_object.update({"phone": phone})
+        phone_key = phone.replace("+", "")
+        try:
+            # if phone_key in CLIENTS.keys():
+            if task_id is not None:
+                filter = { 'phone': phone_key }
+                newvalues = { "$set": { "task_id": task_id , "category_id": cate_id} }
+                DB_ACCOUNT.update_one(filter, newvalues)
+                response_object.update({"status": 1, "message": "All done!"})
+            else:
+                response_object.update({"status": 0, "message": "task id is null"})
+            return jsonify(response_object)
+
+        except Exception as e:
+            if phone_key in CLIENTS.keys():
+                CLIENTS.pop(phone_key)
+                new_dict = { "$set": {"status": "not author"}}
+                query = { "phone":  phone_key}
+                x = DB_ACCOUNT.update_many(query, new_dict)
+            return jsonify({"message": str(e), "status": 0})
 
 @app.route('/init-exam', methods=['GET', 'POST'])
 async def init_exam():
@@ -211,11 +268,9 @@ async def categories():
         type_id = data.get("type_id")
         query = {}
         if type_id is not None:
-            if int(type_id)<=2:
-                list_cate_results.append({"id": ALL_CATEGORIES, "type": '#', "name": "All"})
             query.update({"type_id": type_id})
-        else:
-            list_cate_results.append({"id": ALL_CATEGORIES, "type": '#', "name": "All"})
+        # else:
+        #     list_cate_results.append({"id": ALL_CATEGORIES, "type": '#', "name": "All"})
         cate_for = data.get("cate_for")
         if cate_for is not None:
             query.update({"cate_for": cate_for})
@@ -465,15 +520,40 @@ async def post_process():
 
 @app.route('/reload-db', methods=['GET'])
 async def reload_db():
-    service.INIT = False
+    new_dict = { "$set": {"status": "1"}}
+    query = { "name": "reload"}
+    DB_LOG.update_many(query, new_dict)
     return jsonify({"status": "done"}) 
 
+@app.route('/get-list-log', methods=['GET'])
+async def get_list_log():
+    get_data = request.args
+    log_task = get_data.get("log_task")
+    list_log_file = glob.glob("./logs/{}/*.log".format(log_task))
+    result = []
+    for log_file in list_log_file:
+        log_name = log_file.split("/")[-1].split(".")[0]
+        result.append(log_name)
+    return jsonify(result) 
 
-# @app.route('/get_category', methods=['GET'])
-# async def get_category():
-#     # data = request.args
-#     # print(data.get("id"))
-#     return jsonify([{"id": 1, "name":"share keo"}, {"id": 2, "name":"ca do"}]) 
+@app.route('/get-log-data', methods=['POST'])
+async def get_data_log():
+
+    post_data = await request.get_json()
+    log_task = post_data.get("log_task")
+    log_file = post_data.get("log_file")
+    from_line = post_data.get("from", 0)
+    if from_line == "" or from_line is None:
+        from_line = 0
+    size = post_data.get("size")
+    if size == "" or size is None:
+        size = 100
+    result = []
+    with open("./logs/{}/{}.log".format(log_task, log_file), "r") as f:
+        lines = f.readlines()
+        for line in lines[int(from_line): int(from_line) + int(size)]:
+            result.append({"log_info": line})
+    return jsonify(result) 
 
 
 async def main():
@@ -481,30 +561,5 @@ async def main():
     config =  hypercorn.Config.from_pyfile("./config.py")
     await hypercorn.asyncio.serve(app, config)
 
-
-# By default, `Quart.run` uses `asyncio.run()`, which creates a new asyncio
-# event loop. Instead, we use `asyncio.run()` manually in order to make this
-# explicit, as the client cannot be "transferred" between loops while
-# connected due to the need to schedule work within an event loop.
-#
-# In essence one needs to be careful to avoid mixing event loops, but this is
-# simple, as `asyncio.run` is generally only used in the entry-point of the
-# program.
-#
-# To run Quart inside `async def`, we must use `hypercorn.asyncio.serve()`
-# directly.
-#
-# This example creates a global client outside of Quart handlers.
-# If you create the client inside the handlers (common case), you
-# won't have to worry about any of this, but it's still good to be
-# explicit about the event loop.
 if __name__ == '__main__':
-    # run_init()
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    # loop = asyncio.get_event_loop()
-    loop.create_task(service.Sender())
-    loop.create_task(main())
-    Process(loop.run_until_complete(service.Crawl())).run()
-    
-    # asyncio.run(main())
+    asyncio.run(main())

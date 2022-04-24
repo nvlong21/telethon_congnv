@@ -12,8 +12,11 @@ STOP_WORDS = 5
 
 COLLECTION = pymongo.MongoClient(MONGO)
 DB_FORWARD_CHAT = COLLECTION["tele_forward_chat"]
-ALL_CATEGORIES = "52d8151df4f344bba4b5c56974213dbd"
-
+ALL_CATEGORIES_POST = "52d8151df4f344bba4b5c56974213dbd"
+ALL_CATEGORIES_CRAWL = "52d8151df4f344bba4b5c56974213bbd"
+ALL_CATEGORIES_FILTER = "52d8151df4f344bba4b5c56974213fbd"
+ALL_CATEGORIES_STOP = "52d8151df4f344bba4b5c56974213sbd"
+ALL_CATEGORIES_REPLACE = "52d8151df4f344bba4b5c56974213rbd"
 DB_ACCOUNT = DB_FORWARD_CHAT["accounts"]
 DB_CATEGORIES = DB_FORWARD_CHAT["categories"]
 DB_KEYWORD = DB_FORWARD_CHAT["keywords"]
@@ -22,6 +25,13 @@ DB_REPLACE_WORD = DB_FORWARD_CHAT["replace_words"]
 DB_CRAWL = DB_FORWARD_CHAT["crawls"]
 DB_POST = DB_FORWARD_CHAT["posts"]
 DB_TASK = DB_FORWARD_CHAT["tasks"]
+DB_LOG = DB_FORWARD_CHAT["logs"]
+# temp = DB_LOG.find_one({"name": "reload"})
+# if temp is None:
+
+new_dict = { "$set": {"status_crawl": "0", "status_sender": "0"}}
+query = { "name": "reload"}
+DB_LOG.update_many(query, new_dict)
 temp = DB_TASK.find_one({"name": "Crawl"})
 if temp is None:
     DB_TASK.insert_one({"id": str(CRAWL), "name": "Crawl", "cate_for": "account"})
@@ -37,6 +47,31 @@ if temp is None:
 temp = DB_TASK.find_one({"name": "Stop Words"})
 if temp is None:
     DB_TASK.insert_one({"id": str(STOP_WORDS), "name": "Stop Words", "cate_for": "filter"})
+
+
+temp = DB_CATEGORIES.find_one({"id": ALL_CATEGORIES_CRAWL})
+if temp is None:
+    DB_CATEGORIES.insert_one({"id": str(ALL_CATEGORIES_CRAWL), "name": "All", "type_id": "1" })
+
+temp = DB_CATEGORIES.find_one({"id": ALL_CATEGORIES_POST})
+if temp is None:
+    DB_CATEGORIES.insert_one({"id": str(ALL_CATEGORIES_POST), "name": "All", "type_id": "2" })
+
+
+temp = DB_CATEGORIES.find_one({"id": ALL_CATEGORIES_FILTER})
+if temp is None:
+    DB_CATEGORIES.insert_one({"id": str(ALL_CATEGORIES_FILTER), "name": "All", "type_id": "3" })
+
+temp = DB_CATEGORIES.find_one({"id": ALL_CATEGORIES_REPLACE})
+if temp is None:
+    DB_CATEGORIES.insert_one({"id": str(ALL_CATEGORIES_REPLACE), "name": "All", "type_id": "4" })
+
+temp = DB_CATEGORIES.find_one({"id": ALL_CATEGORIES_STOP})
+if temp is None:
+    DB_CATEGORIES.insert_one({"id": str(ALL_CATEGORIES_STOP), "name": "All", "type_id": "5" })
+
+
+
 def drop_all():
     DB_ACCOUNT.drop()
     DB_CATEGORIES.drop()

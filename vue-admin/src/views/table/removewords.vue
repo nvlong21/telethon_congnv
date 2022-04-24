@@ -85,7 +85,6 @@ export default {
       }
       fetch(this.base_app_api + '/remove-words', requestOptions).then(async response => {
         fetch(this.base_app_api + '/reload-db').then(async response => {
-          
         })
         const datas = await response.json()
         alert(datas.message)
@@ -112,7 +111,6 @@ export default {
     deleteByID(id) {
       fetch(this.base_app_api + '/remove-word/' + id, { method: 'DELETE' }).then(async response => {
         fetch(this.base_app_api + '/reload-db').then(async response => {
-          
         })
         const datas = await response.json()
         alert(datas.message)
