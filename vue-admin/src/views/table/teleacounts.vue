@@ -198,7 +198,7 @@ export default {
           this.open_add_task = true
         }
         else{
-          alert(datas.message)
+          alert(data.message)
         }
       })
     },
@@ -226,7 +226,7 @@ export default {
             }
           }
         } else {
-          alert(datas.message)
+          alert(data.message)
         }
       })
     },
