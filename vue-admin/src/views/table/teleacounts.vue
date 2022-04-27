@@ -6,7 +6,7 @@
       <h3>Upload session</h3>
       <el-form ref="form" :model="upload_form" label-width="120px">
         <el-form-item label="Session">
-          <input type="file"  @change="handleFileUpload( $event )"/>
+          <input type="file" multiple="multiple"  @change="handleFileUpload( $event )"/>
         </el-form-item>
         <el-form-item label="Task">
           <el-select v-model="upload_form.task_id" placeholder="please select task" @change="dropDownTaskChange">
@@ -128,7 +128,7 @@ export default {
   data() {
     return {
       upload_form:{
-        file: null,
+        files: null,
         task_id: null,
         category_id: null
       },
@@ -153,12 +153,15 @@ export default {
   },
   methods: {
     handleFileUpload( event ){
-      this.upload_form.file = event.target.files[0]
-      console.log(this.upload_form.file)
+      this.upload_form.files = event.target.files
     },
     Upload() {
       const formData = new FormData();
-      formData.append('file', this.upload_form.file);
+      for( var i = 0; i < this.upload_form.files.length; i++ ){
+          const file = this.upload_form.files[i];
+          formData.append('files-' + i, file);
+      }
+      // formData.append('file', this.upload_form.file);
       formData.append('task_id',  this.upload_form.task_id);
       formData.append('category_id', this.upload_form.category_id);
       const requestData = {
@@ -168,9 +171,8 @@ export default {
       }
       fetch(this.base_app_api + '/sessions-upload', requestData).then(async response => {
         const data = await response.json()
-        alert(data.message)
+        alert(data.status)
       })
-
     },
     addAccountCode() {
       const requestOptions = {

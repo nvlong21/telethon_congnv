@@ -12,7 +12,7 @@ from mongo import *
 import uuid
 from multiprocessing.dummy import Process, Queue
 import glob
-
+import subprocess
 logger.add("logs/api/{time:YYYY-MM-DD}_1.log", rotation="500 MB")
 def get_env(name, message):
     if name in os.environ:
@@ -51,6 +51,9 @@ async def delete_session(phone):
     x = DB_ACCOUNT.find_one(query)
     if x is not None:
         DB_ACCOUNT.delete_many(query)
+    phone = process_phone(phone)  
+    phone_key = phone.replace("+", "")
+    subprocess.run(["rm", "-f", "{}.session".format(phone_key)])
     return jsonify({"message": "success", "status": 1})
 
 @app.route('/sessions-upload', methods=['POST'])
@@ -60,35 +63,45 @@ async def sessions_upload():
     task_id = form.get("task_id")
     cate_id = form.get('category_id')
     response_object = {}
-    file = files.get("file")
-    if file and file.filename:
-        await file.save(file.filename)
-        phone = file.filename.split(".")[0]
-        phone = process_phone(phone)
-        response_object.update({"phone": phone})
-        phone_key = phone.replace("+", "")
-        query = {"phone": str(phone_key)}
-        client_name = DB_ACCOUNT.find_one(query)
-        if client_name is None or (client_name.get("status") != "live"):
-            client = TelegramClient(phone_key, API_ID, API_HASH)
-            try:
-                await client.connect()
-                if await client.is_user_authorized():
-                    if client_name is None:
-                        mydict = {"id": str(uuid.uuid4().hex), "phone": phone_key, "status": "live"}
-                        DB_ACCOUNT.insert_one(mydict)
-                    else:
-                        filter = { 'phone': phone_key }
-                        newvalues = { "$set": { "task_id": task_id , "category_id": cate_id, "status": "live"} }
-                        DB_ACCOUNT.update_one(filter, newvalues)
-                    response_object.update({"status": "1", "message": "success"})
-                    client.disconnect()
+    message = {}
+    for k in files.keys():
+        if k.startswith("file"):
+            file = files.get(k)
+            if file and file.filename:
+                await file.save(file.filename)
+                phone = file.filename.split(".")[0]
+                phone = process_phone(phone)
+                
+                phone_key = phone.replace("+", "")
+                query = {"phone": str(phone_key)}
+                client_name = DB_ACCOUNT.find_one(query)
+                if client_name is None or (client_name.get("status") != "live"):
+                    client = TelegramClient(phone_key, API_ID, API_HASH)
+                    try:
+                        await client.connect()
+                        if await client.is_user_authorized():
+                            if client_name is None:
+                                mydict = {"id": str(uuid.uuid4().hex), "task_id": task_id , "category_id": cate_id, "phone": phone_key, "status": "live"}
+                                DB_ACCOUNT.insert_one(mydict)
+                            else:
+                                filter = { 'phone': phone_key }
+                                newvalues = { "$set": { "task_id": task_id , "category_id": cate_id, "status": "live"} }
+                                DB_ACCOUNT.update_one(filter, newvalues)
+                            # response_object.update({"status": "1", "message": "success"})
+                            status =  1
+                            message.update({phone_key: "success"})
+                            client.disconnect()
+                        else:
+                            message.update({phone_key: "Not activated"})
+                            # status =  0 
+                            # response_object.update({"status": "0", "message": "Please upload client activated"})
+                    except Exception as e:
+                        message.update({phone_key: str(e)})
+                        # status =  0
+                        # response_object.update({"status": "0", "message": str(e)})
                 else:
-                    response_object.update({"status": "0", "message": "Please upload client activated"})
-            except Exception as e:
-                response_object.update({"status": "0", "message": str(e)})
-        else:
-            return jsonify({"message": "Client is exist!", "status": 1})
+                    message.update({phone_key: "Eexist!"})
+    response_object.update({"status": "1", "message": message})
     return jsonify(response_object)
 
 
@@ -182,7 +195,7 @@ async def sessions_code():
                 else:
                     if code is not None:
                         await CLIENTS[phone_key].sign_in(code=code)
-                        if await client.is_user_authorized():
+                        if await CLIENTS[phone_key].is_user_authorized():
                             newvalues = { "$set": { 'status': "live" } }
                             DB_ACCOUNT.update_one(query, newvalues)
                             response_object.update({"status": 2, "message": "sussess"})
@@ -193,6 +206,8 @@ async def sessions_code():
                             response_object.update({"status": 0, "message": "Code is not correct!"})
                     else:
                         response_object.update({"status": 0, "message": "Code error"})
+            else:
+                response_object.update({"message": "please get code"})
             return jsonify(response_object)
 
         except Exception as e:
