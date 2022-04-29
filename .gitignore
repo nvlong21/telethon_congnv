@@ -6,3 +6,5 @@ forwarder.session
 config.ini
 mount_data/*
 api/logs*
+docker-compose-kafka.yml
+docker-compose.yml

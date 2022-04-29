@@ -171,7 +171,7 @@ export default {
       }
       fetch(this.base_app_api + '/sessions-upload', requestData).then(async response => {
         const data = await response.json()
-        alert(data.status)
+        alert(data.message)
       })
     },
     addAccountCode() {

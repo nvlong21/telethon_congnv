@@ -65,47 +65,51 @@ async def sessions_upload():
     response_object = {}
     message = {}
     for k in files.keys():
-        if k.startswith("file"):
-            file = files.get(k)
-            if file and file.filename:
-                await file.save(file.filename)
-                phone = file.filename.split(".")[0]
-                phone = process_phone(phone)
-                phone_key = phone.replace("+", "")
-                query = {"phone": str(phone_key)}
-                client_name = DB_ACCOUNT.find_one(query)
-                if client_name is None or (client_name.get("status") != "live"):
-                    client = TelegramClient(phone_key, API_ID, API_HASH)
-                    try:
-                        await client.connect()
-                        if await client.is_user_authorized():
-                            if client_name is None:
-                                mydict = {"id": str(uuid.uuid4().hex), "task_id": task_id , "category_id": cate_id, "phone": phone_key, "status": "live"}
-                                DB_ACCOUNT.insert_one(mydict)
+        try:
+            if k.startswith("file"):
+                file = files.get(k)
+                if file and file.filename:
+                    await file.save(file.filename)
+                    phone = file.filename.split(".")[0]
+                    phone = process_phone(phone)
+                    phone_key = phone.replace("+", "")
+                    query = {"phone": str(phone_key)}
+                    client_name = DB_ACCOUNT.find_one(query)
+                    if client_name is None or (client_name.get("status") != "live"):
+                        client = TelegramClient(phone_key, API_ID, API_HASH)
+                        try:
+                            await client.connect()
+                            if await client.is_user_authorized():
+                                if client_name is None:
+                                    mydict = {"id": str(uuid.uuid4().hex), "task_id": task_id , "category_id": cate_id, "phone": phone_key, "status": "live"}
+                                    DB_ACCOUNT.insert_one(mydict)
+                                else:
+                                    filter = { 'phone': phone_key }
+                                    newvalues = { "$set": { "task_id": task_id , "category_id": cate_id, "status": "live"} }
+                                    DB_ACCOUNT.update_one(filter, newvalues)
+                                # response_object.update({"status": "1", "message": "success"})
+                                
+                                message.update({phone_key: "success"})
+                                client.disconnect()
                             else:
-                                filter = { 'phone': phone_key }
-                                newvalues = { "$set": { "task_id": task_id , "category_id": cate_id, "status": "live"} }
-                                DB_ACCOUNT.update_one(filter, newvalues)
-                            # response_object.update({"status": "1", "message": "success"})
-                            status =  1
-                            message.update({phone_key: "success"})
-                            client.disconnect()
-                        else:
-                            if client_name is None:
-                                mydict = {"id": str(uuid.uuid4().hex), "task_id": task_id , "category_id": cate_id, "phone": phone_key, "status": "Not activated"}
-                                DB_ACCOUNT.insert_one(mydict)
-                            else:
-                                filter = { 'phone': phone_key }
-                                newvalues = { "$set": { "task_id": task_id , "category_id": cate_id, "status": "Not activated"} }
-                                DB_ACCOUNT.update_one(filter, newvalues)
-                            
-                    except Exception as e:
-                        message.update({phone_key: str(e)})
-                        # status =  0
-                        # response_object.update({"status": "0", "message": str(e)})
-                else:
-                    message.update({phone_key: "Exist!"})
-    response_object.update({"status": "1", "message": "success", "logs": message})
+                                if client_name is None:
+                                    mydict = {"id": str(uuid.uuid4().hex), "task_id": task_id , "category_id": cate_id, "phone": phone_key, "status": "Not activated"}
+                                    DB_ACCOUNT.insert_one(mydict)
+                                else:
+                                    filter = { 'phone': phone_key }
+                                    newvalues = { "$set": { "task_id": task_id , "category_id": cate_id, "status": "Not activated"} }
+                                    DB_ACCOUNT.update_one(filter, newvalues)
+                                message.update({phone_key: "Not activate"})
+                        except Exception as e:
+                            message.update({phone_key: str(e)})
+                            # status =  0
+                            # response_object.update({"status": "0", "message": str(e)})
+                    else:
+                        message.update({phone_key: "Exist!"})
+            response_object.update({"status": "1", "message": "success", "logs": message})
+        except Exception as e1:
+            response_object.update({"status": "1", "message": str(e1), "logs": message})
+    
     return jsonify(response_object)
 
 
