@@ -71,7 +71,6 @@ async def sessions_upload():
                 await file.save(file.filename)
                 phone = file.filename.split(".")[0]
                 phone = process_phone(phone)
-                
                 phone_key = phone.replace("+", "")
                 query = {"phone": str(phone_key)}
                 client_name = DB_ACCOUNT.find_one(query)
@@ -92,16 +91,21 @@ async def sessions_upload():
                             message.update({phone_key: "success"})
                             client.disconnect()
                         else:
-                            message.update({phone_key: "Not activated"})
-                            # status =  0 
-                            # response_object.update({"status": "0", "message": "Please upload client activated"})
+                            if client_name is None:
+                                mydict = {"id": str(uuid.uuid4().hex), "task_id": task_id , "category_id": cate_id, "phone": phone_key, "status": "Not activated"}
+                                DB_ACCOUNT.insert_one(mydict)
+                            else:
+                                filter = { 'phone': phone_key }
+                                newvalues = { "$set": { "task_id": task_id , "category_id": cate_id, "status": "Not activated"} }
+                                DB_ACCOUNT.update_one(filter, newvalues)
+                            
                     except Exception as e:
                         message.update({phone_key: str(e)})
                         # status =  0
                         # response_object.update({"status": "0", "message": str(e)})
                 else:
-                    message.update({phone_key: "Eexist!"})
-    response_object.update({"status": "1", "message": message})
+                    message.update({phone_key: "Exist!"})
+    response_object.update({"status": "1", "message": "success", "logs": message})
     return jsonify(response_object)
 
 
